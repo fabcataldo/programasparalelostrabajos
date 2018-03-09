@@ -86,7 +86,7 @@ void matmul_t(double* a, double* b, double* c, double* bt, int size){
 		for(j=0;j<size;j++){
 			for(k=0;k<size;k++){
 				//printf("zxzzzzz");
-				c[i*size+j]+=a[i*size+k]*b[j*size+k];
+				c[i*size+j]+=a[i*size+k]*bt[j*size+k];
 				//printf("ASDADSASD:  %lf",c[i*size+j]);			
 			}
 		}	
@@ -105,9 +105,9 @@ void matmul_t_5(double* a, double* b, double *c, double* bt, int size){
 	for(i=0;i<size;i++)
 		for(j=0;j<size;j++)
 			for(k=0;k<size;k+5){
-				c[i*size+j]+=a[i*size+k]*b[k*size+j]+a[i*size+(k+1)]*b[(k+1)*size+j]
-					+a[i*size+(k+2)]*b[(k+2)*size+j]+a[i*size+(k+3)]*b[(k+3)*size+j]
-					+a[i*size+(k+4)]*b[(k+4)*size+j];
+				c[i*size+j]+=a[i*size+k]*bt[j*size+k] + a[i*size+(k+1)]*bt[j*size+(k+1)]
+					+a[i*size+(k+2)]*bt[j*size+(k+2)] + a[i*size+(k+3)]*bt[j*size+(k+3)]
+					+a[i*size+(k+4)]*bt[j*size+(k+4)];
 				if(k<1){
 					break;				
 				}	
@@ -126,11 +126,11 @@ void matmul_t_10(double* a, double* b,double *c, double* bt, int size){
 	for(i=0;i<size;i++)
 		for(j=0;j<size;j++)
 			for(k=0;k<size;k+10){
-				c[i*size+j]+=a[i*size+k]*b[k*size+j]+a[i*size+(k+1)]*b[(k+1)*size+j]
-					+a[i*size+(k+2)]*b[(k+2)*size+j]+a[i*size+(k+3)]*b[(k+3)*size+j]
-					+a[i*size+(k+4)]*b[(k+4)*size+j]+a[i*size+(k+5)]*b[(k+5)*size+j]
-					+a[i*size+(k+6)]*b[(k+6)*size+j]+a[i*size+(k+7)]*b[(k+7)*size+j]
-					+a[i*size+(k+8)]*b[(k+8)*size+j]+a[i*size+(k+9)]*b[(k+9)*size+j];
+				c[i*size+j]+=a[i*size+k]*bt[k*size+j]+a[i*size+(k+1)]*bt[j*size+(k+1)]
+					+a[i*size+(k+2)]*bt[j*size+(k+2)]+a[i*size+(k+3)]*bt[j*size+(k+3)]
+					+a[i*size+(k+4)]*bt[j*size+(k+4)]+a[i*size+(k+5)]*bt[j*size+(k+5)]
+					+a[i*size+(k+6)]*bt[j*size+(k+6)]+a[i*size+(k+7)]*bt[j*size+(k+7)]
+					+a[i*size+(k+8)]*bt[j*size+(k+8)]+a[i*size+(k+9)]*bt[j*size+(k+9)];
 				if(k<1){
 					break;				
 				}
@@ -161,16 +161,6 @@ void mostrarmatriz(double* matriz, int size){
 }
 
 
-/*void liberarmatriz(double* matriz, int size){
-	int i,j;
-
-	for(i=0;i<size;i++){
-		for(j=0;j<size;j++){
-			free(matriz[i+j*size]);
-		}
-	}
-}*/
-
 int main(){
 	int n,i,j;
 
@@ -194,37 +184,70 @@ int main(){
 	printf("\nAhora, MOSTRAMOS MATRIZ B:\n");	
 	mostrarmatriz(matrizb, n);
 	
-	/*matmul_5(matriza,matrizb,matrizc,n);
+	
+	printf("\n\nProbamos matmul");
+	matmul(matriza,matrizb,matrizc,n);
+	printf("\n");	
+
+	printf("\nAhora, MOSTRAMOS MATRIZ C resultado:\n");	
+	mostrarmatriz(matrizc,n);
+	
+	printf("\n--------------------------------------------------------------\n");	
+	
+	printf("\nProbamos matmul_5");
+	matmul_5(matriza,matrizb,matrizc,n);
 	printf("\n\n");
 	
 	printf("\nAhora, MOSTRAMOS MATRIZ C resultado:\n");	
 	mostrarmatriz(matrizc,n);
-	*/
+	
+	printf("\n--------------------------------------------------------------\n");	
 
-	/*matmul_10(matriza,matrizb,matrizc,n);
+	printf("\nProbamos matmul_10");
+	matmul_10(matriza,matrizb,matrizc,n);
 	printf("\n\n");
 	
 	printf("\nAhora, MOSTRAMOS MATRIZ C resultado:\n");	
 	mostrarmatriz(matrizc,n);
-	*/
 
-	/*printf("\n\n\nTRANSPONEMOS MATRIZ B");
+	printf("\n--------------------------------------------------------------\n");	
+
+
+	/*
+	printf("\n\n\nTRANSPONEMOS MATRIZ B");
 	matriztranspuesta(matrizb,matrizt,n);	
 	
 	printf("\nMOSTRAMOS matriz bT");
-	mostrarmatriz(matrizt, n);*/
-
-	/*printf("\nProbamos matmul_t");
+	mostrarmatriz(matrizt, n);
+	*/
+	
+	
+	printf("\nProbamos matmul_t");
 	matmul_t(matriza, matrizb, matrizc, matrizt, n);
 	
 	printf("\nAhora, MOSTRAMOS MATRIZ C resultado:\n");	
 	mostrarmatriz(matrizc,n);
-	*/
+	
+	printf("\n--------------------------------------------------------------\n");	
+	
+	printf("\nProbamos matmul_t_5");
+	matmul_t_5(matriza, matrizb, matrizc, matrizt, n);
+	
+	printf("\nAhora, MOSTRAMOS MATRIZ C resultado:\n");	
+	mostrarmatriz(matrizc,n);
+	
+	printf("\n--------------------------------------------------------------\n");	
 
+	printf("\nProbamos matmul_t_10");
+	matmul_t_10(matriza, matrizb, matrizc, matrizt, n);
+	
+	printf("\nAhora, MOSTRAMOS MATRIZ C resultado:\n");	
+	mostrarmatriz(matrizc,n);
+	
+	
 	/*free(matriza);
 	free(matrizb);
 	free(matrizc);
+	free(matrizt);
 	*/
-
-	printf("\n");
 }
