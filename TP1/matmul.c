@@ -163,9 +163,6 @@ int main(int argc, char **argv){
 	clock_t startclk, endclk;
 	double totalclk1,totalclk2,totalclk3,totalclk4,totalclk5,totalclk6; 
 	FILE *fp = fopen(argv[1], "w+");
-
-	/*printf("Ingrese el tamanio de la matriz a y b: ");
-	scanf("%d",&n);*/
 	
 	cargarmatriz(matriza, nmax);
 	cargarmatriz(matrizb, nmax);	
@@ -203,7 +200,6 @@ int main(int argc, char **argv){
 		matmul_t_10(matriza, matrizb, matrizc, matrizt, i);
 		endclk = clock();
 		totalclk6 = (double) (endclk-startclk)/CLOCKS_PER_SEC;	
-		//printf("%d   %lf   %lf   %lf   %lf   %lf     %lf\n", i, totalclk1, totalclk2, totalclk3, totalclk4, totalclk5, totalclk6);
 		fprintf(fp, "%d   %lf   %lf   %lf   %lf   %lf     %lf\n", i, totalclk1, totalclk2, totalclk3, totalclk4, totalclk5, totalclk6);
 	}
 	
