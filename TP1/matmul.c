@@ -30,7 +30,6 @@ void matmul_5(double* a, double* b, double *c, int size){
 				c[i*size+j]+=a[i*size+k]*b[k*size+j]+a[i*size+(k+1)]*b[(k+1)*size+j]
 					+a[i*size+(k+2)]*b[(k+2)*size+j]+a[i*size+(k+3)]*b[(k+3)*size+j]
 					+a[i*size+(k+4)]*b[(k+4)*size+j];
-				//printf("c[i*size+j]: %lf", c[i*size+j]);
 				if(k<1){
 					break;				
 				}	
@@ -53,9 +52,7 @@ void matmul_10(double* a, double* b,double *c, int size){
 					+a[i*size+(k+8)]*b[(k+8)*size+j]+a[i*size+(k+9)]*b[(k+9)*size+j];
 				if(k<1){
 					break;				
-				}
-				//printf("c[i*size+j]: %lf", c[i*size+j]);
-						
+				}		
 			}
 }
 
@@ -86,9 +83,7 @@ void matmul_t(double* a, double* b, double* c, double* bt, int size){
 	for(i=0;i<size;i++){
 		for(j=0;j<size;j++){
 			for(k=0;k<size;k++){
-				//printf("zxzzzzz");
-				c[i*size+j]+=a[i*size+k]*bt[j*size+k];
-				//printf("ASDADSASD:  %lf",c[i*size+j]);			
+				c[i*size+j]+=a[i*size+k]*bt[j*size+k];		
 			}
 		}	
 	}
@@ -134,20 +129,17 @@ void matmul_t_10(double* a, double* b,double *c, double* bt, int size){
 					+a[i*size+(k+8)]*bt[j*size+(k+8)]+a[i*size+(k+9)]*bt[j*size+(k+9)];
 				if(k<1){
 					break;				
-				}
-				//printf("c[i*size+j]: %lf", c[i*size+j]);
-						
+				}						
 			}
 }
 
 
 void cargarmatriz(double* matriz, int size){
 	int i,j;
-
+	
 	for(i=0;i<size;i++){
 		for(j=0;j<size;j++){
-			printf("Matriz [%d][%d]: ",i,j);
-			scanf("%lf",&matriz[i*size+j]);
+			matriz[i*size+j]=rand();
 		}
 	}
 }
@@ -162,93 +154,60 @@ void mostrarmatriz(double* matriz, int size){
 }
 
 
-int main(){
-	int n,i,j;
+int main(int argc, char **argv){
+	int n,i,j;	
+	double* matriza=(double*)malloc(n*n*sizeof(double));
+	double* matrizb=(double*)malloc(n*n*sizeof(double)); 
+	double*	matrizc=(double*)malloc(n*n*sizeof(double));
+	double* matrizt=(double*)malloc(n*n*sizeof(double));
+	clock_t startclk, endclk;
+	double totalclk1,totalclk2,totalclk3,totalclk4,totalclk5,totalclk6; 
+	FILE *fp = fopen(argv[1], "w+");
 
 	printf("Ingrese el tamanio de la matriz a y b: ");
 	scanf("%d",&n);
 	
-	double* matriza=malloc(n*sizeof(double));
-	double* matrizb=malloc(n*sizeof(double)); 
-	double*	matrizc=malloc(n*sizeof(double));
-
-	double* matrizt=malloc(n*sizeof(double)); 
-
-	printf("Ahora, ingresamos los distintos valores de la matriz A, por fila:\n");	
 	cargarmatriz(matriza, n);
-	printf("Ahora, ingresamos los distintos valores de la matriz B, por fila:\n");	
 	cargarmatriz(matrizb, n);	
-
-	printf("\n\n\n");	
-	printf("Ahora, MOSTRAMOS MATRIZ A:\n");	
-	mostrarmatriz(matriza, n);
-	printf("\nAhora, MOSTRAMOS MATRIZ B:\n");	
-	mostrarmatriz(matrizb, n);
 	
-	
-	printf("\n\nProbamos matmul");
+	printf("n   matmul   matmul_5   matmul_10   matmul_t   matmul_t_5   matmul_t_10\n");
+	fprintf(fp, "n   matmul   matmul_5   matmul_10   matmul_t   matmul_t_5   matmul_t_10\n");
+		
+	startclk = clock();
 	matmul(matriza,matrizb,matrizc,n);
-	printf("\n");	
-
-	printf("\nAhora, MOSTRAMOS MATRIZ C resultado:\n");	
-	mostrarmatriz(matrizc,n);
+	endclk = clock();
+	totalclk1 = (double) (endclk-startclk)/CLOCKS_PER_SEC;	
 	
-	printf("\n--------------------------------------------------------------\n");	
-	
-	printf("\nProbamos matmul_5");
+	startclk = clock();
 	matmul_5(matriza,matrizb,matrizc,n);
-	printf("\n\n");
+	endclk = clock();
+	totalclk2 = (double) (endclk-startclk)/CLOCKS_PER_SEC;	
 	
-	printf("\nAhora, MOSTRAMOS MATRIZ C resultado:\n");	
-	mostrarmatriz(matrizc,n);
-	
-	printf("\n--------------------------------------------------------------\n");	
-
-	printf("\nProbamos matmul_10");
+	startclk = clock();
 	matmul_10(matriza,matrizb,matrizc,n);
-	printf("\n\n");
+	endclk = clock();
+	totalclk3 = (double) (endclk-startclk)/CLOCKS_PER_SEC;	
 	
-	printf("\nAhora, MOSTRAMOS MATRIZ C resultado:\n");	
-	mostrarmatriz(matrizc,n);
-
-	printf("\n--------------------------------------------------------------\n");	
-
-
-	/*
-	printf("\n\n\nTRANSPONEMOS MATRIZ B");
-	matriztranspuesta(matrizb,matrizt,n);	
-	
-	printf("\nMOSTRAMOS matriz bT");
-	mostrarmatriz(matrizt, n);
-	*/
-	
-	
-	printf("\nProbamos matmul_t");
+	startclk = clock();
 	matmul_t(matriza, matrizb, matrizc, matrizt, n);
-	
-	printf("\nAhora, MOSTRAMOS MATRIZ C resultado:\n");	
-	mostrarmatriz(matrizc,n);
-	
-	printf("\n--------------------------------------------------------------\n");	
-	
-	printf("\nProbamos matmul_t_5");
+	endclk = clock();
+	totalclk4 = (double) (endclk-startclk)/CLOCKS_PER_SEC;	
+		
+	startclk = clock();
 	matmul_t_5(matriza, matrizb, matrizc, matrizt, n);
-	
-	printf("\nAhora, MOSTRAMOS MATRIZ C resultado:\n");	
-	mostrarmatriz(matrizc,n);
-	
-	printf("\n--------------------------------------------------------------\n");	
+	endclk = clock();
+	totalclk5 = (double) (endclk-startclk)/CLOCKS_PER_SEC;	
 
-	printf("\nProbamos matmul_t_10");
+	startclk = clock();
 	matmul_t_10(matriza, matrizb, matrizc, matrizt, n);
+	endclk = clock();
+	totalclk6 = (double) (endclk-startclk)/CLOCKS_PER_SEC;	
+	printf("%d   %lf   %lf   %lf   %lf   %lf     %lf\n", n, totalclk1, totalclk2, totalclk3, totalclk4, totalclk5, totalclk6);
+	fprintf(fp, "%d   %lf   %lf   %lf   %lf   %lf     %lf", n, totalclk1, totalclk2, totalclk3, totalclk4, totalclk5, totalclk6);
 	
-	printf("\nAhora, MOSTRAMOS MATRIZ C resultado:\n");	
-	mostrarmatriz(matrizc,n);
-	
-	
+	//fclose(fp);
 	/*free(matriza);
 	free(matrizb);
 	free(matrizc);
-	free(matrizt);
-	*/
+	free(matrizt);*/
 }
