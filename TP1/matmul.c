@@ -203,13 +203,13 @@ int main(int argc, char **argv){
 		matmul_t_10(matriza, matrizb, matrizc, matrizt, i);
 		endclk = clock();
 		totalclk6 = (double) (endclk-startclk)/CLOCKS_PER_SEC;	
-		printf("%d   %lf   %lf   %lf   %lf   %lf     %lf\n", i, totalclk1, totalclk2, totalclk3, totalclk4, totalclk5, totalclk6);
-		fprintf(fp, "%d   %lf   %lf   %lf   %lf   %lf     %lf", i, totalclk1, totalclk2, totalclk3, totalclk4, totalclk5, totalclk6);
+		//printf("%d   %lf   %lf   %lf   %lf   %lf     %lf\n", i, totalclk1, totalclk2, totalclk3, totalclk4, totalclk5, totalclk6);
+		fprintf(fp, "%d   %lf   %lf   %lf   %lf   %lf     %lf\n", i, totalclk1, totalclk2, totalclk3, totalclk4, totalclk5, totalclk6);
 	}
 	
-	//fclose(fp);
-	/*free(matriza);
+	fclose(fp);
+	free(matriza);
 	free(matrizb);
 	free(matrizc);
-	free(matrizt);*/
+	free(matrizt);
 }
