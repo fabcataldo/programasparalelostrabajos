@@ -155,55 +155,57 @@ void mostrarmatriz(double* matriz, int size){
 
 
 int main(int argc, char **argv){
-	int n,i,j;	
-	double* matriza=(double*)malloc(n*n*sizeof(double));
-	double* matrizb=(double*)malloc(n*n*sizeof(double)); 
-	double*	matrizc=(double*)malloc(n*n*sizeof(double));
-	double* matrizt=(double*)malloc(n*n*sizeof(double));
+	int nmax=1200,i=0;	
+	double* matriza=(double*)malloc(nmax*nmax*sizeof(double));
+	double* matrizb=(double*)malloc(nmax*nmax*sizeof(double)); 
+	double*	matrizc=(double*)malloc(nmax*nmax*sizeof(double));
+	double* matrizt=(double*)malloc(nmax*nmax*sizeof(double));
 	clock_t startclk, endclk;
 	double totalclk1,totalclk2,totalclk3,totalclk4,totalclk5,totalclk6; 
 	FILE *fp = fopen(argv[1], "w+");
 
-	printf("Ingrese el tamanio de la matriz a y b: ");
-	scanf("%d",&n);
+	/*printf("Ingrese el tamanio de la matriz a y b: ");
+	scanf("%d",&n);*/
 	
-	cargarmatriz(matriza, n);
-	cargarmatriz(matrizb, n);	
+	cargarmatriz(matriza, nmax);
+	cargarmatriz(matrizb, nmax);	
 	
 	printf("n   matmul   matmul_5   matmul_10   matmul_t   matmul_t_5   matmul_t_10\n");
 	fprintf(fp, "n   matmul   matmul_5   matmul_10   matmul_t   matmul_t_5   matmul_t_10\n");
 		
-	startclk = clock();
-	matmul(matriza,matrizb,matrizc,n);
-	endclk = clock();
-	totalclk1 = (double) (endclk-startclk)/CLOCKS_PER_SEC;	
+	for(i=400;i<=nmax;i+10){
+		startclk = clock();
+		matmul(matriza,matrizb,matrizc,i);
+		endclk = clock();
+		totalclk1 = (double) (endclk-startclk)/CLOCKS_PER_SEC;	
 	
-	startclk = clock();
-	matmul_5(matriza,matrizb,matrizc,n);
-	endclk = clock();
-	totalclk2 = (double) (endclk-startclk)/CLOCKS_PER_SEC;	
+		startclk = clock();
+		matmul_5(matriza,matrizb,matrizc,i);
+		endclk = clock();
+		totalclk2 = (double) (endclk-startclk)/CLOCKS_PER_SEC;	
 	
-	startclk = clock();
-	matmul_10(matriza,matrizb,matrizc,n);
-	endclk = clock();
-	totalclk3 = (double) (endclk-startclk)/CLOCKS_PER_SEC;	
+		startclk = clock();
+		matmul_10(matriza,matrizb,matrizc,i);
+		endclk = clock();
+		totalclk3 = (double) (endclk-startclk)/CLOCKS_PER_SEC;	
 	
-	startclk = clock();
-	matmul_t(matriza, matrizb, matrizc, matrizt, n);
-	endclk = clock();
-	totalclk4 = (double) (endclk-startclk)/CLOCKS_PER_SEC;	
+		startclk = clock();
+		matmul_t(matriza, matrizb, matrizc, matrizt, i);
+		endclk = clock();
+		totalclk4 = (double) (endclk-startclk)/CLOCKS_PER_SEC;	
 		
-	startclk = clock();
-	matmul_t_5(matriza, matrizb, matrizc, matrizt, n);
-	endclk = clock();
-	totalclk5 = (double) (endclk-startclk)/CLOCKS_PER_SEC;	
+		startclk = clock();
+		matmul_t_5(matriza, matrizb, matrizc, matrizt, i);
+		endclk = clock();
+		totalclk5 = (double) (endclk-startclk)/CLOCKS_PER_SEC;	
 
-	startclk = clock();
-	matmul_t_10(matriza, matrizb, matrizc, matrizt, n);
-	endclk = clock();
-	totalclk6 = (double) (endclk-startclk)/CLOCKS_PER_SEC;	
-	printf("%d   %lf   %lf   %lf   %lf   %lf     %lf\n", n, totalclk1, totalclk2, totalclk3, totalclk4, totalclk5, totalclk6);
-	fprintf(fp, "%d   %lf   %lf   %lf   %lf   %lf     %lf", n, totalclk1, totalclk2, totalclk3, totalclk4, totalclk5, totalclk6);
+		startclk = clock();
+		matmul_t_10(matriza, matrizb, matrizc, matrizt, i);
+		endclk = clock();
+		totalclk6 = (double) (endclk-startclk)/CLOCKS_PER_SEC;	
+		printf("%d   %lf   %lf   %lf   %lf   %lf     %lf\n", i, totalclk1, totalclk2, totalclk3, totalclk4, totalclk5, totalclk6);
+		fprintf(fp, "%d   %lf   %lf   %lf   %lf   %lf     %lf", i, totalclk1, totalclk2, totalclk3, totalclk4, totalclk5, totalclk6);
+	}
 	
 	//fclose(fp);
 	/*free(matriza);
