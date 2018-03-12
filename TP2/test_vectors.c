@@ -13,24 +13,18 @@ int main(int argc, char **argv){
 	long suma2;
 	int tamaniovector=10;
 	int elemento_a_buscar;
-	int elemento_a_buscar_2;
 	int* vector1=(int*)malloc(tamaniovector*sizeof(int));
-	int* vector2=(int*)malloc(tamaniovector*sizeof(int));
 	cargarvector(vector1, size);
-	cargarvector2(vector2, size);
 
-	printf("\ntamanio del vector  elemento a buscar  suma del vector1  suma del vector2\n");	
+	printf("\ntamanio del vector  elemento a buscar  suma del vector1\n");	
 	elemento_a_buscar=vector1[tamaniovector-3];
-	elemento_a_buscar_2=vector2[tamaniovector-3];	
 	for(tamaniovector=10;tamaniovector<=tamaniomaximo;tamaniovector+=10){
 		indice_elemento_a_buscar_encontrado=find(elemento_a_buscar,vector1,tamaniovector);
 		suma1=sum(vector1,tamaniovector);
-		suma2=sum(vector2,tamaniovector);
-		printf("%d			%d		%li		%li\n", tamaniovector, elemento_a_buscar, suma1, suma2);	
+		printf("%d			%d		%li		\n", tamaniovector, elemento_a_buscar, suma1);	
 		
 	}
 
 	free(vector1);
-	free(vector2);
 	return 0;
 }
