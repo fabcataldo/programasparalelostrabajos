@@ -18,14 +18,19 @@ void* finditerativo(void* arg){
 	((estructura*)arg)->tamaniomaximo=400;
 	((estructura*)arg)->vector1=(int*)malloc(((estructura*)arg)->tamaniovector*sizeof(int));
 	cargarvector(((estructura*)arg)->vector1, ((estructura*)arg)->tamaniovector);
-	((estructura*)arg)->elemento_a_buscar=((estructura*)arg)->vector1[((estructura*)arg)->tamaniovector-1];
+	
 	((estructura*)arg)->indice_elemento_a_buscar_encontrado=0;	
 
 	printf("\ntamanio del vector  elemento a buscar  indice del elemento encontrado\n");
 	for(((estructura*)arg)->tamaniovector=10;((estructura*)arg)->tamaniovector<=((estructura*)arg)->tamaniomaximo;((estructura*)arg)->tamaniovector+=10){
+		if(((estructura*)arg)->tamaniovector>10){
+			((estructura*)arg)->vector1=(int*)malloc(((estructura*)arg)->tamaniovector*sizeof(int));
+			cargarvector(((estructura*)arg)->vector1, ((estructura*)arg)->tamaniovector);
+		}
+		((estructura*)arg)->elemento_a_buscar=((estructura*)arg)->vector1[((estructura*)arg)->tamaniovector-2];
 		((estructura*)arg)->indice_elemento_a_buscar_encontrado=find(((estructura*)arg)->elemento_a_buscar, ((estructura*)arg)->vector1, ((estructura*)arg)->tamaniovector);
 	
-		printf("\n%d,   %d,   %d\n",((estructura*)arg)->tamaniovector, ((estructura*)arg)->elemento_a_buscar, ((estructura*)arg)->indice_elemento_a_buscar_encontrado);
+		printf("\n\t%d\t\t%d\t\t%d",((estructura*)arg)->tamaniovector, ((estructura*)arg)->elemento_a_buscar, ((estructura*)arg)->indice_elemento_a_buscar_encontrado);
 	}
 	free(((estructura*)arg)->vector1);
 	return arg;
@@ -38,12 +43,12 @@ void* sumiterativo(void* arg){
 	cargarvector(((estructura*)arg)->vector1, ((estructura*)arg)->tamaniovector);
 	((estructura*)arg)->elemento_a_buscar=((estructura*)arg)->vector1[((estructura*)arg)->tamaniovector-1];
 	((estructura*)arg)->indice_elemento_a_buscar_encontrado=0;	
-	((estructura*)arg)->suma=0;
 
 	printf("\ntamanio del vector  suma del vector\n");
 	for(((estructura*)arg)->tamaniovector=10;((estructura*)arg)->tamaniovector<=((estructura*)arg)->tamaniomaximo;((estructura*)arg)->tamaniovector+=10){
+		((estructura*)arg)->suma=0;
 		((estructura*)arg)->suma=sum(((estructura*)arg)->vector1, ((estructura*)arg)->tamaniovector);
-		printf("\n%d,   %ld\n",((estructura*)arg)->tamaniovector, ((estructura*)arg)->suma);
+		printf("\n\t%d\t\t%ld",((estructura*)arg)->tamaniovector, ((estructura*)arg)->suma);
 	}
 	free(((estructura*)arg)->vector1);
 	pthread_exit(arg);
@@ -56,13 +61,13 @@ int main(int argc, char **argv){
 	estructura s; //puntero a la estructura
 
 	//creo dos hilos, uno que llame a find() variando el tamaño del vector
-	printf("\nComienzo un hilo llamando a la función find()");
+	printf("\nComienzo un hilo llamando a la función find()\n");
  	pthread_create(&id, NULL, finditerativo, &s);
 	pthread_join(id,&p);
 	
 
 	//y otro hilo que llame a suma variando el tamaño del vector
-	printf("\nComienzo otro hilo llamando a la función sum()");
+	printf("\n\n\nComienzo otro hilo llamando a la función sum()\n");
  	pthread_create(&id, NULL, sumiterativo, &s);
 	pthread_join(id,&p);
 

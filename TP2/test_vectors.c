@@ -10,18 +10,24 @@ int main(int argc, char **argv){
 	int indice_elemento_a_buscar_encontrado;
 	int tamaniomaximo=500;
 	long suma1;
-	long suma2;
 	int tamaniovector=10;
 	int elemento_a_buscar;
 	int* vector1=(int*)malloc(tamaniovector*sizeof(int));
 	cargarvector(vector1, size);
+	
 
-	printf("\ntamanio del vector  elemento a buscar  suma del vector1\n");	
-	elemento_a_buscar=vector1[tamaniovector-3];
+	printf("\ntamanio del vector  elemento a buscar  suma del vector1   indice del elem encontrado\n");		
 	for(tamaniovector=10;tamaniovector<=tamaniomaximo;tamaniovector+=10){
+		suma1=0;
+		if(tamaniovector>10){
+			vector1=(int*)malloc(tamaniovector*sizeof(int));
+			cargarvector(vector1, tamaniovector);
+		}
+		elemento_a_buscar=vector1[tamaniovector-2];
+
 		indice_elemento_a_buscar_encontrado=find(elemento_a_buscar,vector1,tamaniovector);
 		suma1=sum(vector1,tamaniovector);
-		printf("%d			%d		%li		\n", tamaniovector, elemento_a_buscar, suma1);	
+		printf("%d\t\t\t%d\t\t\t%ld\t\t\t%d\n", tamaniovector, elemento_a_buscar, suma1, indice_elemento_a_buscar_encontrado);	
 		
 	}
 

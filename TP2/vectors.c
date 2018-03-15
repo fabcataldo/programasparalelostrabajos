@@ -4,20 +4,16 @@
 
 int find(int value, int *vector, int size){
 	int i;
-	int resultado=-1;
 	for(i=0;i<size;i++){
 		if(value==vector[i]){
-			resultado=i;
+			return i;
 		}
-		else{
-			resultado=-1;		
-		}	
 	}
-	return resultado;
+	return -1;
 }
 
 long sum(int *vector, int size){
-	long suma;
+	long suma=0;
 	int i;
 	for(i=0;i<size;i++){
 		suma+=vector[i];	
@@ -27,15 +23,10 @@ long sum(int *vector, int size){
 
 void cargarvector(int *vector, int size){
 	int i;
+	int contador=1;
 	for(i=0;i<size;i++){
-		vector[i]=i+1;
-	}
-}
-
-void cargarvector2(int *vector, int size){
-	int i;
-	for(i=0;i<size;i++){
-		vector[i]=(i+1)*2;
+		vector[i]=contador;
+		contador++;
 	}
 }
 

@@ -18,10 +18,17 @@ int main(int argc, char **argv){
 	double totalclk,totalclk2;
 
 	cargarvector(vector1, tamaniovector);
-	int elemento_a_buscar=vector1[tamaniovector-3];	
+	int elemento_a_buscar;
 	
-	printf("\ntamanio del vector  elemento a buscar  suma del vector  tiempo que tardó find()  tiempo que tardó sum()\n");	
-	for(tamaniovector=10;tamaniovector<=tamaniomaximo;tamaniovector+=10){
+	printf("\ntamanio del vector  elemento a buscar  suma del vector  tiempo que tardó find()  tiempo que tardó sum()   indice del elem encontrado\n");	
+	for(tamaniovector=10;tamaniovector<=tamaniomaximo;tamaniovector+=10){	
+		suma1=0;
+		if(tamaniovector>10){
+			vector1=(int*)malloc(tamaniovector*sizeof(int));
+			cargarvector(vector1, tamaniovector);
+		}
+		elemento_a_buscar=vector1[tamaniovector-2];
+
 		startclk = clock();	
 		indice_elemento_a_buscar_encontrado=find(elemento_a_buscar,vector1,tamaniovector);
 		endclk = clock();
@@ -31,7 +38,7 @@ int main(int argc, char **argv){
 		suma1=sum(vector1,tamaniovector);
 		endclk=clock();
 		totalclk2=(double)(endclk-startclk)/CLOCKS_PER_SEC;
-		printf("%d			%d		%li		  %lf		  %lf\n", tamaniovector, elemento_a_buscar, suma1, totalclk, totalclk2);	
+		printf("%d			%d		%li		  %lf		  %lf		  %d\n", tamaniovector, elemento_a_buscar, suma1, totalclk, totalclk2, indice_elemento_a_buscar_encontrado);	
 		
 	}
 	free(vector1);
