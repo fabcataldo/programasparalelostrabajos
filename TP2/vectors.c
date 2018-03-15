@@ -5,16 +5,11 @@
 int find(int value, int *vector, int size){
 	int i;
 	int resultado=-1;
-//	printf("asdasdads");
-	//int *puntero = &vector[0];
 	for(i=0;i<size;i++){
-		//printf("\nasdasd %d", *(puntero+i));
 		if(value==vector[i]){
 			resultado=i;
-//			printf("\nresultado: %d",resultado);
 		}
 		else{
-//			printf("\nresultado: %d",resultado);
 			resultado=-1;		
 		}	
 	}
@@ -25,7 +20,6 @@ long sum(int *vector, int size){
 	long suma;
 	int i;
 	for(i=0;i<size;i++){
-//		printf("suma: %d",suma);
 		suma+=vector[i];	
 	}
 	return suma;
