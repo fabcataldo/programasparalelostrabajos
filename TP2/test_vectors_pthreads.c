@@ -120,7 +120,7 @@ void* sumiterativos1(void* arg){
 
 	((estructuras*)arg)->sumaparcial1=0;	
 	printf("\ntamanio del vector  suma parcial 1 del vector\n");
-	for(i=0;i<((estructuras*)arg)->tamaniovector;i++){
+	for(i=0;i<((estructuras*)arg)->tamaniovector/2;i++){
 		((estructuras*)arg)->sumaparcial1+=((estructuras*)arg)->semivector11[i];		
 	}
 	printf("\n\t%d\t\t%ld",((estructuras*)arg)->tamaniovector, ((estructuras*)arg)->sumaparcial1);
@@ -129,15 +129,16 @@ void* sumiterativos1(void* arg){
 }
 
 void* sumiterativos2(void* arg){
-	int i;
+	int i,j;
 	((estructuras*)arg)->semivector12 = (int*)malloc((((estructuras*)arg)->tamaniovector)*sizeof(int));
-	for(i=((estructuras*)arg)->tamaniovector/2;i<((estructuras*)arg)->tamaniovector;i++){
-		((estructuras*)arg)->semivector12[i]=((estructuras*)arg)->vector1[i];
+	for(i=((estructuras*)arg)->tamaniovector/2;i<((estructuras*)arg)->tamaniovector;i++){ //CORREGIR
+		for(j=0;j<((estructuras*)arg)->tamaniovector/2;j++)
+			((estructuras*)arg)->semivector12[j]=((estructuras*)arg)->vector1[i];
 	}
 	visualizarvector(((estructuras*)arg)->semivector12,((estructuras*)arg)->tamaniovector/2);
 	((estructuras*)arg)->sumaparcial2=0;	
 	printf("\ntamanio del vector  suma parcial 2 del vector\n");
-	for(i=0;i<((estructuras*)arg)->tamaniovector;i++){
+	for(i=0;i<((estructuras*)arg)->tamaniovector/2;i++){
 		((estructuras*)arg)->sumaparcial2+=((estructuras*)arg)->semivector12[i];		
 	}
 	printf("\n\t%d\t\t%ld",((estructuras*)arg)->tamaniovector, ((estructuras*)arg)->sumaparcial2);
@@ -190,7 +191,7 @@ int main(int argc, char **argv){
 	printf("-----------------------------------------------------------------------------\n");
 	printf("\n\nCada hilo va a trabajar con dos mitades del vector");
 	s.tamaniovector=n;
-	s.tamaniovector=n;
+
 	s.vector1 = (int*)malloc(n*sizeof(int));
 	cargarvector(s.vector1, n); 
 
