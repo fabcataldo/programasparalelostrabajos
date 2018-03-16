@@ -37,7 +37,7 @@ void* finditerativof1(void* arg){
 	((estructuraf1*)arg)->indice_elemento_a_buscar_encontrado=0;	
 	int i;
 	((estructuraf1*)arg)->semivector11 = (int*)malloc((((estructuraf1*)arg)->tamaniovector)*sizeof(int));
-	for(i=0;i<(((estructuraf1*)arg)->tamaniovector);i++){
+	for(i=0;i<(((estructuraf1*)arg)->tamaniovector/2);i++){
 		((estructuraf1*)arg)->semivector11[i]=((estructuraf1*)arg)->vector1[i];
 	}
 		
@@ -114,7 +114,7 @@ void* finditerativof2(void* arg){
 void* sumiterativos1(void* arg){
 	int i;
 	((estructuras*)arg)->semivector11 = (int*)malloc((((estructuras*)arg)->tamaniovector)*sizeof(int));
-	for(i=0;i<(((estructuras*)arg)->tamaniovector);i++){
+	for(i=0;i<(((estructuras*)arg)->tamaniovector/2);i++){
 		((estructuras*)arg)->semivector11[i]=((estructuras*)arg)->vector1[i];
 	}
 
@@ -131,9 +131,10 @@ void* sumiterativos1(void* arg){
 void* sumiterativos2(void* arg){
 	int i;
 	((estructuras*)arg)->semivector12 = (int*)malloc((((estructuras*)arg)->tamaniovector)*sizeof(int));
-	for(i=0;i<(((estructuras*)arg)->tamaniovector);i++){
+	for(i=((estructuras*)arg)->tamaniovector/2;i<((estructuras*)arg)->tamaniovector;i++){
 		((estructuras*)arg)->semivector12[i]=((estructuras*)arg)->vector1[i];
 	}
+	visualizarvector(((estructuras*)arg)->semivector12,((estructuras*)arg)->tamaniovector/2);
 	((estructuras*)arg)->sumaparcial2=0;	
 	printf("\ntamanio del vector  suma parcial 2 del vector\n");
 	for(i=0;i<((estructuras*)arg)->tamaniovector;i++){
@@ -175,8 +176,8 @@ int main(int argc, char **argv){
 	//primera mitad del vector para este primer hilo
 	f2.vector1 = (int*)malloc(n*sizeof(int));
 	cargarvector(f2.vector1, n);
-	f1.tamaniovector=n/2;
-	f2.tamaniovector=n/2;	
+	f1.tamaniovector=n;
+	f2.tamaniovector=n;	
 
 	//creo dos hilos para find()
 	printf("\nComienzo hilo 1 llamando a la función find()\n");
@@ -188,8 +189,8 @@ int main(int argc, char **argv){
 
 	printf("-----------------------------------------------------------------------------\n");
 	printf("\n\nCada hilo va a trabajar con dos mitades del vector");
-	s.tamaniovector=n/2;
-	s.tamaniovector=n/2;
+	s.tamaniovector=n;
+	s.tamaniovector=n;
 	s.vector1 = (int*)malloc(n*sizeof(int));
 	cargarvector(s.vector1, n); 
 
