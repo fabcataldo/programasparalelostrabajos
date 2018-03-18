@@ -2,45 +2,43 @@
 #include<time.h>
 #include<stdio.h>
 #include<stdlib.h>
-#include <sys/time.h>
-
-/* retorna "a - b" en segundos */
-double timeval_diff(struct timeval *a, struct timeval *b)
-{
-  return
-    (double)(a->tv_sec + (double)a->tv_usec/1000000) -
-    (double)(b->tv_sec + (double)b->tv_usec/1000000);
-}
 
 int main(int argc, char **argv){
-	struct timeval t_ini, t_fin;
-	double secs,secs1;
-	secs = timeval_diff(&t_fin, &t_ini);
+	struct timespec start, finish; 
+	long secs,secs2;
+	int i,el, i_el_finded;
+	long suma,ns,ns2;
+	int n=1000;
+	FILE *fp = fopen(argv[1], "w+");
 
-	int n,el, i_el_finded;
-	long suma;
-	printf("\nIngrese tamaño del vector a procesar: ");
-	scanf("%d",&n);
 	printf("\nIngrese elemento del vector a buscar (el vector va a ser de la forma 1,2,3... tamaño n): ");
 	scanf("%d",&el);
 	
+	printf("\ntamaño del vector  elemento a buscar  indice del elemento encontrado   suma total del vector      tiempo que tardo find()     tiempo que tardo sum()  \n");	
+	fprintf(fp,"tamaño del vector  elemento a buscar  indice del elemento encontrado   suma total del vector      tiempo que tardo find()     tiempo que tardo sum()");
+	for(i=300;i<n;i+=300){
+		clock_gettime(CLOCK_REALTIME, &start); 
+		i_el_finded=find(el, NULL, i);
+		clock_gettime(CLOCK_REALTIME, &finish); 
+		secs = finish.tv_sec - start.tv_sec;
+		ns = finish.tv_nsec - start.tv_nsec; 
 	
-	printf("\nLlamo a find().");
-	gettimeofday(&t_ini, NULL);	
-	i_el_finded=find(el, NULL, n);
-	gettimeofday(&t_fin, NULL);
-	secs = timeval_diff(&t_fin, &t_ini);
-	printf("\nelemento a buscar  indice del elemento encontrado  tiempo (en seg) que tardó find()\n");
-	printf("\n\t%d\t\t\t\t%d\t\t%lf seg\n",el, i_el_finded, secs);
+		if (start.tv_nsec > finish.tv_nsec) { // clock underflow 
+			--secs; 
+		}	
 
-	printf("\nLlamo a sum().");
-	gettimeofday(&t_ini, NULL);	
-	suma=sum(NULL,n);
-	gettimeofday(&t_fin, NULL);
-	secs1 = timeval_diff(&t_fin, &t_ini);
+		clock_gettime(CLOCK_REALTIME, &start); 	
+		suma=sum(NULL,i);
+		clock_gettime(CLOCK_REALTIME, &finish); 
+		secs2 = finish.tv_sec - start.tv_sec;
+		ns2 = finish.tv_nsec - start.tv_nsec;
 
-	printf("\nsuma total del vector  tiempo que tardó sum()  \n");	
-	printf("%ld\t\t\t%lf seg\n", suma, secs1);	
-
+		if (start.tv_nsec > finish.tv_nsec) { // clock underflow 
+			--secs2; 
+		}	
+		printf("\n\t%d\t\t%d\t\t\t%d\t\t\t\t%ld\t\t\t%e seg\t%e seg\n", i, el,i_el_finded,suma,(double)secs + (double)ns/(double)1000000000, (double)secs2 + (double)ns2/(double)1000000000);
+		fprintf(fp, "\n\t%d\t\t%d\t\t\t%d\t\t\t\t%ld\t\t\t%e seg\t%e seg", i, el,i_el_finded,suma,(double)secs + (double)ns/(double)1000000000, (double)secs2 + (double)ns2/(double)1000000000);
+	}
+	fclose(fp);
 	return 0;
 }
