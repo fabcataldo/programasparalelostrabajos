@@ -1,46 +1,46 @@
-#include "vectors.c"
 #include "vectors.h"
 #include<time.h>
 #include<stdio.h>
 #include<stdlib.h>
+#include <sys/time.h>
+
+/* retorna "a - b" en segundos */
+double timeval_diff(struct timeval *a, struct timeval *b)
+{
+  return
+    (double)(a->tv_sec + (double)a->tv_usec/1000000) -
+    (double)(b->tv_sec + (double)b->tv_usec/1000000);
+}
 
 int main(int argc, char **argv){
-	//argv[1] es el elemento a buscar, argv[2] es el tamaño del vector con el que se quiere trabajar
+	struct timeval t_ini, t_fin;
+	double secs,secs1;
+	secs = timeval_diff(&t_fin, &t_ini);
 
-	int indice_elemento_a_buscar_encontrado;
-	int tamaniomaximo=500;
-	//int tamaniovector=atoi(argv[2]);
-	//int elemento_a_buscar=atoi(argv[1]); //atoi() pasa de char** (ya que en realidad es una cadena) a int
-	long suma1;
-	int tamaniovector=10;
-	int* vector1=(int*)malloc(tamaniovector*sizeof(int));
-	clock_t startclk, endclk;
-	double totalclk,totalclk2;
-
-	cargarvector(vector1, tamaniovector);
-	int elemento_a_buscar;
+	int n,el, i_el_finded;
+	long suma;
+	printf("\nIngrese tamaño del vector a procesar: ");
+	scanf("%d",&n);
+	printf("\nIngrese elemento del vector a buscar (el vector va a ser de la forma 1,2,3... tamaño n): ");
+	scanf("%d",&el);
 	
-	printf("\ntamanio del vector  elemento a buscar  suma del vector  tiempo que tardó find()  tiempo que tardó sum()   indice del elem encontrado\n");	
-	for(tamaniovector=10;tamaniovector<=tamaniomaximo;tamaniovector+=10){	
-		suma1=0;
-		if(tamaniovector>10){
-			vector1=(int*)malloc(tamaniovector*sizeof(int));
-			cargarvector(vector1, tamaniovector);
-		}
-		elemento_a_buscar=vector1[tamaniovector-2];
-
-		startclk = clock();	
-		indice_elemento_a_buscar_encontrado=find(elemento_a_buscar,vector1,tamaniovector);
-		endclk = clock();
-		totalclk=(double)(endclk-startclk)/CLOCKS_PER_SEC;
 	
-		startclk=clock();
-		suma1=sum(vector1,tamaniovector);
-		endclk=clock();
-		totalclk2=(double)(endclk-startclk)/CLOCKS_PER_SEC;
-		printf("%d			%d		%li		  %lf		  %lf		  %d\n", tamaniovector, elemento_a_buscar, suma1, totalclk, totalclk2, indice_elemento_a_buscar_encontrado);	
-		
-	}
-	free(vector1);
+	printf("\nLlamo a find().");
+	gettimeofday(&t_ini, NULL);	
+	i_el_finded=find(el, NULL, n);
+	gettimeofday(&t_fin, NULL);
+	secs = timeval_diff(&t_fin, &t_ini);
+	printf("\nelemento a buscar  indice del elemento encontrado  tiempo (en seg) que tardó find()\n");
+	printf("\n\t%d\t\t\t\t%d\t\t%lf seg\n",el, i_el_finded, secs);
+
+	printf("\nLlamo a sum().");
+	gettimeofday(&t_ini, NULL);	
+	suma=sum(NULL,n);
+	gettimeofday(&t_fin, NULL);
+	secs1 = timeval_diff(&t_fin, &t_ini);
+
+	printf("\nsuma total del vector  tiempo que tardó sum()  \n");	
+	printf("%ld\t\t\t%lf seg\n", suma, secs1);	
+
 	return 0;
 }

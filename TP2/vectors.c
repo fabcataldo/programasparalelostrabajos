@@ -3,6 +3,8 @@
 #include<stdio.h>
 
 int find(int value, int *vector, int size){
+	vector=(int*)malloc(size*sizeof(int));
+	cargarvector(vector,size);
 	int i;
 	for(i=0;i<size;i++){
 		if(value==vector[i]){
@@ -13,6 +15,8 @@ int find(int value, int *vector, int size){
 }
 
 long sum(int *vector, int size){
+	vector=(int*)malloc(size*sizeof(int));
+	cargarvector(vector,size);
 	long suma=0;
 	int i;
 	for(i=0;i<size;i++){
