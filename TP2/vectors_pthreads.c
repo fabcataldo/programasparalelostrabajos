@@ -32,15 +32,15 @@ void* finditerativof1(void* arg){
 
 	((estructuraf1*)arg)->indice_elemento_a_buscar_encontrado=0;	
 	int i;
-	((estructuraf1*)arg)->semivector11 = (int*)malloc((((estructuraf1*)arg)->tamaniovector)*sizeof(int));
+	((estructuraf1*)arg)->semivector11 = (int*)malloc((((estructuraf1*)arg)->tamaniovector/2)*sizeof(int));
 	int tamaniodelvector=((estructuraf1*)arg)->tamaniovector;
 	
-	for(i=0;i<ceil(tamaniodelvector/2);i++){
+	for(i=0;i<tamaniodelvector/2;i++){
 		((estructuraf1*)arg)->semivector11[i]=((estructuraf1*)arg)->vector1[i];
 	}
+	//visualizarvector(((estructuraf1*)arg)->semivector11, tamaniodelvector/2);
 
-
-	for(i=0;i<ceil(tamaniodelvector/2);i++){
+	for(i=0;i<tamaniodelvector/2;i++){
 		if(((estructuraf1*)arg)->elemento_a_buscar==((estructuraf1*)arg)->semivector11[i]){
 			((estructuraf1*)arg)->indice_elemento_a_buscar_encontrado=i;
 		}
@@ -48,7 +48,6 @@ void* finditerativof1(void* arg){
 			((estructuraf1*)arg)->indice_elemento_a_buscar_encontrado=-1;		
 		}
 	}
-
 
 	if(((estructuraf1*)arg)->indice_elemento_a_buscar_encontrado != -1){
 		pthread_mutex_lock(&mutex); //sección crítica
@@ -75,17 +74,20 @@ void* finditerativof2(void* arg){
 		printf("\n\nHilo 2 trabajando en la búsqueda...");
 
 		((estructuraf1*)arg)->indice_elemento_a_buscar_encontrado=0;	
-	
-		int tamaniodelvector=((estructuraf1*)arg)->tamaniovector;
-		int i;
-		((estructuraf1*)arg)->semivector12 = (int*)malloc((((estructuraf1*)arg)->tamaniovector/2)*sizeof(int));
-		for(i=ceil(tamaniodelvector/2);i<((estructuraf1*)arg)->tamaniovector;i++){
-			((estructuraf1*)arg)->semivector12[i]=((estructuraf1*)arg)->vector1[i];
+
+		int tamaniodelvectorf2=(((estructuraf1*)arg)->tamaniovector)/2;	
+		int i,j;
+		((estructuraf1*)arg)->semivector12 = (int*)malloc((tamaniodelvectorf2)*sizeof(int));
+		j=tamaniodelvectorf2;
+		for(i=0;i<tamaniodelvectorf2;i++){	
+			((estructuraf1*)arg)->semivector12[i]=((estructuraf1*)arg)->vector1[j];
+			j+=1;
 		}
 
+		//visualizarvector(((estructuraf1*)arg)->semivector12, tamaniodelvectorf2);
 
-		for(i=0;i<ceil(tamaniodelvector/2);i++){
-			if(((estructuraf1*)arg)->elemento_a_buscar==((estructuraf1*)arg)->semivector11[i]){
+		for(i=0;i<tamaniodelvectorf2;i++){
+			if(((estructuraf1*)arg)->elemento_a_buscar==((estructuraf1*)arg)->semivector12[i]){
 				((estructuraf1*)arg)->indice_elemento_a_buscar_encontrado=i;
 			}
 			else{
@@ -147,7 +149,7 @@ void* sumiterativos2(void* arg){
 	((estructuras*)arg)->semivector12 = (int*)malloc((((estructuras*)arg)->tamaniovector)*sizeof(int));
 
 	int tamaniodelvector=((estructuras*)arg)->tamaniovector;
-	for(i=(tamaniodelvector/2);i<((estructuras*)arg)->tamaniovector;i++){ //CORREGIR
+	for(i=(tamaniodelvector/2);i<((estructuras*)arg)->tamaniovector;i++){
 		for(j=0;j<(tamaniodelvector/2);j++)
 			((estructuras*)arg)->semivector12[j]=((estructuras*)arg)->vector1[i];
 	}
@@ -189,6 +191,7 @@ int find(int value, int *vector, int size){
 			return ((estructuraf1*)pf2)->indice_elemento_a_buscar_encontrado;
 		}
 	}
+	free(f1.vector1);
 	return -1;
 }
 
@@ -208,6 +211,7 @@ long sum(int *vector, int size){
  	pthread_create(&ids2, NULL, sumiterativos2, &s);
 	pthread_join(ids2,&ps2);
 	int sumatotal=((estructuras*)ps1)->sumaparcial1+((estructuras*)ps2)->sumaparcial2;
+	free(s.vector1);
 	return sumatotal;
 }
 
@@ -223,6 +227,6 @@ void cargarvector(int *vector, int size){
 void visualizarvector(int *vector, int size){
 	int i;
 	for(i=0;i<size;i++){
-		printf("\n%d",vector[i]);
+		printf("\n%d\n",vector[i]);
 	}
 }
