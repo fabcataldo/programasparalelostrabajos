@@ -38,7 +38,7 @@ void* finditerativof1(void* arg){
 	for(i=0;i<tamaniodelvector/2;i++){
 		((estructuraf1*)arg)->semivector11[i]=((estructuraf1*)arg)->vector1[i];
 	}
-	visualizarvector(((estructuraf1*)arg)->semivector11, tamaniodelvector/2);
+	//visualizarvector(((estructuraf1*)arg)->semivector11, tamaniodelvector/2);
 
 	for(i=0;i<tamaniodelvector/2;i++){
 		if(((estructuraf1*)arg)->elemento_a_buscar==((estructuraf1*)arg)->semivector11[i]){
@@ -171,6 +171,7 @@ int find(int value, int *vector, int size){
 	void* pf2 = NULL;//puntero 2 a lo que retorna la función de finditerativof1
 	estructuraf1 f1; //puntero a la estructura del hilo 1 e hilo 2 para find()
 	
+
 	f1.elemento_a_buscar=value;	
 	f1.vector1 = (int*)malloc(size*sizeof(int));
 	cargarvector(f1.vector1, size);
