@@ -21,11 +21,13 @@ int find(int value, int *v, int size){
 	return resultado;
 }
 
-long sum(int *vector, int size){
-	long suma=0;
+double sum(double *v, int size){
 	int i;
-	for(i=0;i<size;i++){
-		suma+=vector[i];	
-	}
+	int chunk = size/2;
+	double suma=0;
+		#pragma omp parallel for reduction(+:suma) schedule(dynamic, chunk)//manejo de hilos dinámico
+			for(i=0;i<size;i++){	
+				suma+=v[i];	
+			}
 	return suma;
 }

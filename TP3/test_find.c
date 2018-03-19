@@ -3,7 +3,7 @@
 
 void cargarvector(int *vector, int size){
 	int i;
-	for(i=0;i<size-1;i++){
+	for(i=0;i<=size-1;i++){
 		vector[i]=i;
 	}
 }
@@ -29,6 +29,7 @@ void visualizarvector(int *vector, int size){
 	}
 }
 
+int find(int value, int *v, int size);
 
 int main(int argc, char **argv){
 	int el,i_el_finded, i_el_finded_2, i_el_finded_3;
