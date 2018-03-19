@@ -5,7 +5,7 @@
 int find(int value, int *v, int size){
 	int i, resultado;
 	int chunk = size/2;
-	#pragma omp parallel private(resultado)//comparto v y size ya que nunca van a cambiar
+	#pragma omp parallel private(resultado)
 	resultado=0;
 	{	
 		#pragma omp parallel for schedule(dynamic, chunk) //manejo de hilos dinámico
