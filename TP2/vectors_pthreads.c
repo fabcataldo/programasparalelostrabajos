@@ -28,7 +28,7 @@ typedef struct{
 
 
 void* finditerativof1(void* arg){
-	printf("\n\nHilo 1 trabajando en la búsqueda...");
+	//printf("\n\nHilo 1 trabajando en la búsqueda...");
 
 	((estructuraf1*)arg)->indice_elemento_a_buscar_encontrado=0;	
 	int i;
@@ -38,7 +38,7 @@ void* finditerativof1(void* arg){
 	for(i=0;i<tamaniodelvector/2;i++){
 		((estructuraf1*)arg)->semivector11[i]=((estructuraf1*)arg)->vector1[i];
 	}
-	//visualizarvector(((estructuraf1*)arg)->semivector11, tamaniodelvector/2);
+	visualizarvector(((estructuraf1*)arg)->semivector11, tamaniodelvector/2);
 
 	for(i=0;i<tamaniodelvector/2;i++){
 		if(((estructuraf1*)arg)->elemento_a_buscar==((estructuraf1*)arg)->semivector11[i]){
@@ -52,7 +52,7 @@ void* finditerativof1(void* arg){
 	if(((estructuraf1*)arg)->indice_elemento_a_buscar_encontrado != -1){
 		pthread_mutex_lock(&mutex); //sección crítica
 		banderafin=1; //terminé el hilo	
-		printf("\nSoy el hilo 1 y... LO ENCONTREEEEE");	
+		//printf("\nSoy el hilo 1 y... LO ENCONTREEEEE");	
 		free(((estructuraf1*)arg)->semivector11);
 		pthread_mutex_unlock(&mutex); //desbloqueo diciendo "ya toqué banderafin"
 		return arg;		
@@ -62,7 +62,7 @@ void* finditerativof1(void* arg){
 		banderafin=0; 	
 		free(((estructuraf1*)arg)->semivector11);
 		pthread_mutex_unlock(&mutex); //desbloqueo diciendo "ya toqué banderafin"
-		printf("\nSoy el hilo 1 y... NOO LO ENCONTREEEEE");	
+		//printf("\nSoy el hilo 1 y... NOO LO ENCONTREEEEE");	
 		return arg;		
 	}
 }
@@ -71,7 +71,7 @@ void* finditerativof2(void* arg){
 	//while (!banderafin) //dejo que el otro hilo comience a buscar, para que cuando encuentre el elemento, modifique la bandera
 		//pthread_cond_wait(&condicion, &mutex);
 	if(banderafin==0){
-		printf("\n\nHilo 2 trabajando en la búsqueda...");
+		//printf("\n\nHilo 2 trabajando en la búsqueda...");
 
 		((estructuraf1*)arg)->indice_elemento_a_buscar_encontrado=0;	
 
@@ -81,6 +81,7 @@ void* finditerativof2(void* arg){
 		j=tamaniodelvectorf2;
 		for(i=0;i<tamaniodelvectorf2;i++){	
 			((estructuraf1*)arg)->semivector12[i]=((estructuraf1*)arg)->vector1[j];
+			//printf("%d",((estructuraf1*)arg)->semivector12[i]);
 			j+=1;
 		}
 
@@ -103,13 +104,13 @@ void* finditerativof2(void* arg){
 			free(((estructuraf1*)arg)->semivector12);
 			//pthread_cond_signal(&condicion); //despierto al otro hilo
 			pthread_mutex_unlock(&mutex); //desbloqueo diciendo "ya toqué banderafin", y encontré el elemento
-			printf("\nSoy el hilo 2 y... LO ENCONTREEEEE");	
+			//printf("\nSoy el hilo 2 y... LO ENCONTREEEEE");	
 			return arg;		
 		}
 		else{
 			banderafin=0; //terminé el hilo, y no encontré el elemento	
-			printf("\nSoy el hilo 2 y no lo encontre.");	
-			printf("\nEl hilo 1 lo va a buscar ahora. Tranquilo!!\n");
+			//printf("\nSoy el hilo 2 y no lo encontre.");	
+			//printf("\nEl hilo 1 lo va a buscar ahora. Tranquilo!!\n");
 			free(((estructuraf1*)arg)->semivector12);
 			//pthread_cond_signal(&condicion); //despierto al otro hilo
 			pthread_mutex_unlock(&mutex); //desbloqueo diciendo "ya toqué banderafin", y no encontré el elemento
@@ -135,11 +136,11 @@ void* sumiterativos1(void* arg){
 	}
 
 	((estructuras*)arg)->sumaparcial1=0;	
-	printf("\ntamanio del vector  suma parcial 1 del vector\n");
+	//printf("\ntamanio del vector  suma parcial 1 del vector\n");
 	for(i=0;i<ceil(tamaniodelvector/2);i++){
 		((estructuras*)arg)->sumaparcial1+=((estructuras*)arg)->semivector11[i];		
 	}
-	printf("\n\t%d\t\t%ld",((estructuras*)arg)->tamaniovector, ((estructuras*)arg)->sumaparcial1);
+	//printf("\n\t%d\t\t%ld",((estructuras*)arg)->tamaniovector, ((estructuras*)arg)->sumaparcial1);
 	free(((estructuras*)arg)->semivector11);
 	pthread_exit(arg);
 }
@@ -154,11 +155,11 @@ void* sumiterativos2(void* arg){
 			((estructuras*)arg)->semivector12[j]=((estructuras*)arg)->vector1[i];
 	}
 	((estructuras*)arg)->sumaparcial2=0;	
-	printf("\ntamanio del vector  suma parcial 2 del vector\n");
+	//printf("\ntamanio del vector  suma parcial 2 del vector\n");
 	for(i=0;i<(tamaniodelvector/2);i++){
 		((estructuras*)arg)->sumaparcial2+=((estructuras*)arg)->semivector12[i];		
 	}
-	printf("\n\t%d\t\t%ld",((estructuras*)arg)->tamaniovector, ((estructuras*)arg)->sumaparcial2);
+	//printf("\n\t%d\t\t%ld",((estructuras*)arg)->tamaniovector, ((estructuras*)arg)->sumaparcial2);
 	free(((estructuras*)arg)->semivector12);
 	pthread_exit(arg);
 }
@@ -175,11 +176,11 @@ int find(int value, int *vector, int size){
 	cargarvector(f1.vector1, size);
 	f1.tamaniovector=size;
 
-	printf("\nComienzo hilo 1 llamando a la función find()\n");
+	//printf("\nComienzo hilo 1 llamando a la función find()\n");
  	pthread_create(&idf1, NULL, finditerativof1, &f1);
 	pthread_join(idf1,&pf1);	
 
-	printf("\nComienzo hilo 2 llamando a la función find()\n");
+	//printf("\nComienzo hilo 2 llamando a la función find()\n");
  	pthread_create(&idf2, NULL, finditerativof2, &f1);
 	pthread_join(idf2,&pf2);
 
