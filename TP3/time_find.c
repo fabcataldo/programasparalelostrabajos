@@ -32,28 +32,29 @@ void cargarvector3(int *vector, int size){
 	}
 }
 
-void test_1(int* vector1, int* vector2, int* vector3 , int size){
-	omp_set_num_threads(2);	
+void tester(int* vector1, int* vector2, int* vector3, int elementos[], int num_hilos, int size){
+	omp_set_num_threads(num_hilos);	
 	
-	int elemento = 10000;
 	double start1,start2,start3,end1,end2,end3,t1,t2,t3;
 	int i_el_finded, i_el_finded_2, i_el_finded_3;	
 
 	start1 = omp_get_wtime();
-	i_el_finded=find(elemento, vector1, size);
+	i_el_finded=find(elementos[0], vector1, size);
 	end1 = omp_get_wtime();
 
 	start2 = omp_get_wtime();
-	i_el_finded_2=find(elemento, vector2, size);
+	i_el_finded_2=find(elementos[1], vector2, size);
 	end2 = omp_get_wtime();
 
 	start3 = omp_get_wtime();
-	i_el_finded_3=find(elemento, vector3, size);
+	i_el_finded_3=find(elementos[2], vector3, size);
 	end3 = omp_get_wtime();
 	t1=end1-start1;
 	t2=end2-start2;
 	t3=end3-start3;
-	printf("\nelemento a buscar: %d",elemento); 
+	printf("\nelemento a buscar en vector1: %d",elementos[0]); 
+	printf("\nelemento a buscar en vector2: %d",elementos[1]);
+	printf("\nelemento a buscar en vector3: %d",elementos[2]);
 	printf("\nindice del elemento encontrado con el vector1: %d",i_el_finded);
 	printf("\nindice del elemento encontrado con el vector2: %d",i_el_finded_2);
 	printf("\nindice del elemento encontrado con el vector3: %d", i_el_finded_3);
@@ -62,72 +63,6 @@ void test_1(int* vector1, int* vector2, int* vector3 , int size){
 	printf("\ntiempo que tardó find() en el vector3: %lf\n", t3);
 	printf("----------------------------------------------------------------\n");
 }
-
-void test_2(int* vector1, int* vector2, int* vector3 , int size){
-	omp_set_num_threads(3);	
-	
-	int elemento = size/2;
-	double start1,start2,start3,end1,end2,end3,t1,t2,t3;
-	int i_el_finded, i_el_finded_2, i_el_finded_3;	
-
-	start1 = omp_get_wtime();
-	i_el_finded=find(elemento, vector1, size);
-	end1 = omp_get_wtime();
-
-	start2 = omp_get_wtime();
-	i_el_finded_2=find(elemento, vector2, size);
-	end2 = omp_get_wtime();
-
-	start3 = omp_get_wtime();
-	i_el_finded_3=find(elemento, vector3, size);
-	end3 = omp_get_wtime();
-	t1=end1-start1;
-	t2=end2-start2;
-	t3=end3-start3;
-	printf("\nelemento a buscar: %d",elemento); 
-	printf("\nindice del elemento encontrado con el vector1: %d",i_el_finded);
-	printf("\nindice del elemento encontrado con el vector2: %d",i_el_finded_2);
-	printf("\nindice del elemento encontrado con el vector3: %d", i_el_finded_3);
-	printf("\ntiempo que tardó find() en el vector1: %lf", t1);
-	printf("\ntiempo que tardó find() en el vector2: %lf", t2);
-	printf("\ntiempo que tardó find() en el vector3: %lf\n", t3);
-	printf("\n----------------------------------------------------------------\n");
-}
-
-void test_3(int* vector1, int* vector2, int* vector3 , int size){
-	omp_set_num_threads(4);	
-	
-	int elemento = size+1;
-	int elemento3 = vector3[0]-1;
-
-	double start1,start2,start3,end1,end2,end3,t1,t2,t3;
-	int i_el_finded, i_el_finded_2, i_el_finded_3;	
-
-	start1 = omp_get_wtime();
-	i_el_finded=find(elemento, vector1, size);
-	end1 = omp_get_wtime();
-
-	start2 = omp_get_wtime();
-	i_el_finded_2=find(elemento, vector2, size);
-	end2 = omp_get_wtime();
-
-	start3 = omp_get_wtime();
-	i_el_finded_3=find(elemento3, vector3, size);
-	end3 = omp_get_wtime();
-	t1=end1-start1;
-	t2=end2-start2;
-	t3=end3-start3;
-	printf("\nelemento a buscar en vector1 y vector2: %d",elemento); 
-	printf("\nelemento a buscar en vector3: %d",elemento3); 
-	printf("\nindice del elemento encontrado con el vector1: %d",i_el_finded);
-	printf("\nindice del elemento encontrado con el vector2: %d",i_el_finded_2);
-	printf("\nindice del elemento encontrado con el vector3: %d", i_el_finded_3);
-	printf("\ntiempo que tardó find() en el vector1: %lf", t1);
-	printf("\ntiempo que tardó find() en el vector2: %lf", t2);
-	printf("\ntiempo que tardó find() en el vector3: %lf\n", t3);
-	printf("\n----------------------------------------------------------------\n");
-}
-
 
 int main(int argc, char **argv){
 	//int nProcessors = omp_get_max_threads();
@@ -142,15 +77,31 @@ int main(int argc, char **argv){
 	cargarvector3(vector3,size);
 	
 	printf("\nBÚSQUEDA PARALELIZADA\n");
-
-	printf("\nLlamo a test_1().");
-	test_1(vector1, vector2, vector3, size);
-
-	printf("\nLlamo a test_2().");
-	test_2(vector1, vector2, vector3, size);
+	int elementos_a_buscar[3];
 	
-	printf("\nLlamo a test_3().");
-	test_3(vector1, vector2, vector3, size);
+	//[vector1[1],vector2[0],vector3[0] 
+	elementos_a_buscar[0]=1;
+	elementos_a_buscar[1]=33554430;
+	elementos_a_buscar[2]=389421;
+	int num_hilos = 2;
+	printf("\nLlamo al tester() para buscar los primeros elementos en los 3 vectores.");
+	tester(vector1, vector2, vector3, elementos_a_buscar, num_hilos, size);
+
+	//vector1[size/2], //vector2[size/2], //vector3[size/2]
+	elementos_a_buscar[0]=8388608;
+	elementos_a_buscar[1]=16777214;
+	elementos_a_buscar[2]=-7999187;
+	num_hilos = 3;
+	printf("\nLlamo al tester() para buscar elementos en la mitad de los 3 vectores");
+	tester(vector1, vector2, vector3, elementos_a_buscar, num_hilos, size);
+	
+	//elementos que no estan en los vectores
+	elementos_a_buscar[0]=size+1;
+	elementos_a_buscar[1]=size+1;
+	elementos_a_buscar[2]=vector3[0]-1;
+	num_hilos = 4;
+	printf("\nLlamo al tester() para buscar elementos que no están en los 3 vectores");
+	tester(vector1, vector2, vector3, elementos_a_buscar, num_hilos, size);
 
 	free(vector1);
 	free(vector2);

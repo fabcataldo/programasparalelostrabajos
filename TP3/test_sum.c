@@ -22,7 +22,7 @@ void cargarvector3(double *vector, int size){
 	int i;
 	for(i=0;i<size;i++){
 		srand48(i);
-		vector[i]=(((i*427345)+389421)%size)*drand48();
+		vector[i]=((i*427345)+389421)*drand48();
 	}
 }
 
@@ -32,8 +32,6 @@ void visualizarvector(double *vector, int size){
 		printf("\n%lf",vector[i]);
 	}
 }
-
-
 
 int main(int argc, char **argv){
 	double sum1,sum2,sum3;
@@ -51,8 +49,8 @@ int main(int argc, char **argv){
 	sum1=sum(vector1, size);
 	sum2=sum(vector2, size);
 	sum3=sum(vector3, size);
-	printf("\nsuma vector1                suma vector2         suma vector3\n");
-	printf("\n%lf   %lf    %lf\n", sum1, sum2, sum3);
+	printf("\nsuma vector1           suma vector2       suma vector3\n");
+	printf("\n%.2lf   %.2lf    %.2lf\n", sum1, sum2, sum3);
 
 	return 0;
 }
