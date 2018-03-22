@@ -4,6 +4,13 @@
 
 int find(int value, int *v, int size);
 
+void visualizarvector(int *vector, int size){
+	int i;
+	for(i=0;i<size;i++){
+		printf("\n%d",vector[i]);
+	}
+}
+
 void cargarvector(int *vector, int size){
 	int i;
 	for(i=0;i<=size-1;i++){
@@ -11,11 +18,13 @@ void cargarvector(int *vector, int size){
 	}
 }
 
-void cargarvector2(int *vector, int size){
+void cargarvector2(int *vector, int* aux, int size){
 	int i;
-	for(i=size-1;i<=0;i=(i-1)*2){
-		vector[i]=i;
+	cargarvector(vector,size);
+	for(i=0;i<=size-1;i++){
+		aux[i]=vector[(size-1)-i]*2;
 	}
+	vector=aux;
 }
 
 void cargarvector3(int *vector, int size){
@@ -25,12 +34,7 @@ void cargarvector3(int *vector, int size){
 	}
 }
 
-void visualizarvector(int *vector, int size){
-	int i;
-	for(i=0;i<size;i++){
-		printf("\n%d",vector[i]);
-	}
-}
+
 
 int main(int argc, char **argv){
 	int el,i_el_finded, i_el_finded_2, i_el_finded_3;
@@ -38,7 +42,9 @@ int main(int argc, char **argv){
 	int* vector1=(int*)malloc(size*sizeof(int));
 	cargarvector(vector1,size);
 	int* vector2=(int*)malloc(size*sizeof(int));
-	cargarvector2(vector2,size);
+	int* aux = (int*)malloc(size*sizeof(int));
+	cargarvector2(vector2, aux, size);
+	free(aux);
 	int* vector3=(int*)malloc(size*sizeof(int));
 	cargarvector3(vector3,size);
 
@@ -52,6 +58,9 @@ int main(int argc, char **argv){
 	i_el_finded_3=find(el, vector3, size);
 	printf("\nelemento a buscar  indice del elemento encontrado con el vector1  indice del elemento encontrado con el vector2   indice del elemento encontrado con el vector3\n");
 	printf("\n\t%d\t\t\t%d\t\t%d\t\t%d\n", el, i_el_finded, i_el_finded_2, i_el_finded_3);
-
+	
+	free(vector1);
+	free(vector2);
+	free(vector3);
 	return 0;
 }
