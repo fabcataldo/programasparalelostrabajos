@@ -18,13 +18,11 @@ void cargarvector(int *vector, int size){
 	}
 }
 
-void cargarvector2(int *vector, int* aux, int size){
+void cargarvector2(int *vector, int size){
 	int i;
-	cargarvector(vector,size);
 	for(i=0;i<=size-1;i++){
-		aux[i]=vector[(size-1)-i]*2;
+		vector[i]=((size-1)-i)*2;
 	}
-	vector=aux;
 }
 
 void cargarvector3(int *vector, int size){
@@ -97,13 +95,6 @@ void test_2(int* vector1, int* vector2, int* vector3 , int size){
 }
 
 void test_3(int* vector1, int* vector2, int* vector3 , int size){
-	/*visualizarvector(vector1,3);
-	printf("\n");
-	visualizarvector(vector2,3);
-	printf("\n");
-	*/
-	visualizarvector(vector3,3);
-	
 	omp_set_num_threads(4);	
 	
 	int elemento = size+1;
@@ -146,12 +137,10 @@ int main(int argc, char **argv){
 	int* vector1=(int*)malloc(size*sizeof(int));
 	cargarvector(vector1,size);
 	int* vector2=(int*)malloc(size*sizeof(int));
-	int* aux = (int*)malloc(size*sizeof(int));
-	cargarvector2(vector2, aux, size);
-	free(aux);
+	cargarvector2(vector2, size);
 	int* vector3=(int*)malloc(size*sizeof(int));
 	cargarvector3(vector3,size);
-
+	
 	printf("\nBÚSQUEDA PARALELIZADA\n");
 
 	printf("\nLlamo a test_1().");
