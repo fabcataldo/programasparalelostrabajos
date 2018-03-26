@@ -83,6 +83,9 @@ int main(int argc, char **argv){
 	printf("\nLlamo a sum() con 4 hilos.");
 	num_hilos=4;
 	tester(vector1,vector2,vector3,num_hilos,size);
+	printf("\nLlamo a sum() con 8 hilos.");
+	num_hilos=8;
+	tester(vector1,vector2,vector3,num_hilos,size);
 
 	return 0;
 }
