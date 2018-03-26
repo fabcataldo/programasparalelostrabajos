@@ -80,27 +80,56 @@ int main(int argc, char **argv){
 	printf("\nBÚSQUEDA PARALELIZADA\n");
 	int elementos_a_buscar[3];
 
-	//vector1[size/2], //vector2[size/2], //vector3[size/2]
-	elementos_a_buscar[0]=8388608;
-	elementos_a_buscar[1]=16777214;
-	elementos_a_buscar[2]=-7999187;
-	num_hilos = 3;
-	printf("\nLlamo al tester() para buscar elementos en la mitad de los 3 vectores");
+	elementos_a_buscar[0]=vector1[size-1];
+	elementos_a_buscar[1]=vector2[size-2];
+	elementos_a_buscar[2]=vector3[size-1];
+	num_hilos = 1;
+	printf("Llamo al tester() para buscar el último elemento por cada vector con 1 hilo");
+	tester(vector1, vector2, vector3, elementos_a_buscar, num_hilos, size);
+	
+	elementos_a_buscar[0]=vector1[size-1];
+	elementos_a_buscar[1]=vector2[size-2];
+	elementos_a_buscar[2]=vector3[size-1];
+	num_hilos = 2;
+	printf("Llamo al tester() para buscar el último elemento por cada vector con 2 hilos");
 	tester(vector1, vector2, vector3, elementos_a_buscar, num_hilos, size);
 
 	elementos_a_buscar[0]=vector1[size-1];
 	elementos_a_buscar[1]=vector2[size-2];
 	elementos_a_buscar[2]=vector3[size-1];
-	num_hilos = 3;
-	printf("\nLlamo al tester() para buscar el último elemento por cada vector ");
+	num_hilos = 4;
+	printf("Llamo al tester() para buscar el último elemento por cada vector CON 4 HILOS ");
 	tester(vector1, vector2, vector3, elementos_a_buscar, num_hilos, size);
-	
+
+	elementos_a_buscar[0]=vector1[size-1];
+	elementos_a_buscar[1]=vector2[size-2];
+	elementos_a_buscar[2]=vector3[size-1];
+	num_hilos = 8;
+	printf("Llamo al tester() para buscar el último elemento por cada vector CON 8 HILOS ");
+	tester(vector1, vector2, vector3, elementos_a_buscar, num_hilos, size);
+
+	//elementos que no estan en los vectores
+	elementos_a_buscar[0]=size+1;
+	elementos_a_buscar[1]=size+1;
+	elementos_a_buscar[2]=vector3[0]-1;
+	num_hilos = 1;
+	printf("Llamo al tester() para buscar elementos que no están en los 3 vectores CON 1 HILO");
+	tester(vector1, vector2, vector3, elementos_a_buscar, num_hilos, size);
+
+	//elementos que no estan en los vectores
+	elementos_a_buscar[0]=size+1;
+	elementos_a_buscar[1]=size+1;
+	elementos_a_buscar[2]=vector3[0]-1;
+	num_hilos = 2;
+	printf("Llamo al tester() para buscar elementos que no están en los 3 vectores CON 2 HILOS");
+	tester(vector1, vector2, vector3, elementos_a_buscar, num_hilos, size);
+
 	//elementos que no estan en los vectores
 	elementos_a_buscar[0]=size+1;
 	elementos_a_buscar[1]=size+1;
 	elementos_a_buscar[2]=vector3[0]-1;
 	num_hilos = 4;
-	printf("\nLlamo al tester() para buscar elementos que no están en los 3 vectores");
+	printf("Llamo al tester() para buscar elementos que no están en los 3 vectores CON 4 HILOS");
 	tester(vector1, vector2, vector3, elementos_a_buscar, num_hilos, size);
 
 	//elementos que no estan en los vectores
@@ -108,7 +137,7 @@ int main(int argc, char **argv){
 	elementos_a_buscar[1]=size+1;
 	elementos_a_buscar[2]=vector3[0]-1;
 	num_hilos = 8;
-	printf("\nLlamo al tester() para buscar elementos que no están en los 3 vectores CON 8 HILOS");
+	printf("Llamo al tester() para buscar elementos que no están en los 3 vectores CON 8 HILOS");
 	tester(vector1, vector2, vector3, elementos_a_buscar, num_hilos, size);
 
 	free(vector1);

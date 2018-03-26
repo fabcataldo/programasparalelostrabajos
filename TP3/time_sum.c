@@ -74,8 +74,11 @@ int main(int argc, char **argv){
 	cargarvector3(vector3,size);
 
 	printf("\nSUMA PARALELIZADA");
+	printf("\nLlamo a sum() con 1 hilo.");
+	int num_hilos=1;
+	tester(vector1,vector2,vector3,num_hilos,size);
 	printf("\nLlamo a sum() con 2 hilos.");
-	int num_hilos=2;
+	num_hilos=2;
 	tester(vector1,vector2,vector3,num_hilos,size);
 	printf("\nLlamo a sum() con 3 hilos.");
 	num_hilos=3;
