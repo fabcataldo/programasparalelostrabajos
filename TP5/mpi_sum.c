@@ -65,13 +65,17 @@ int main(int argc, char* argv[]){
 		int mensaje=0; //inicializo el lugar a donde va a el resultado del sum()	
 		double start1,end1,t1;
 		MPI_Status status;
-		MPI_Request *request;
+		mensaje=sum(valores, tamanio_vec);
+
+		//printf("%d\n\n", mensaje);
 
 		MPI_Init(&argc, &argv);
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 		MPI_Comm_size(MPI_COMM_WORLD, &p);
+		
 		//printf("MENSAJE ANTES DEL IF: %d", mensaje);
 		if(rank==0){
+			mensaje=0;
 			start1 = MPI_Wtime(); 
 			for(src = 1; src<p; src++){
 				dst=src; //el numero del rango del primer proceso, por lo menos, es 1, los demás son >1
@@ -81,13 +85,12 @@ int main(int argc, char* argv[]){
 				MPI_Recv(&mensaje, 1, MPI_INT, src, tag, MPI_COMM_WORLD, &status);
 				//printf("SRC rank %d: 	%d\n", rank,src);
 				//printf("MENSAJE: %d\n",mensaje);
-				mensaje+=mensaje;			
+				mensaje+=mensaje;	
 			}
 			end1 = MPI_Wtime();
 			t1=end1-start1;
 			printf("Suma total: %d\n", mensaje);
-			fprintf(stderr, "Tiempo transcurrido: %lf\n", t1);	
-			
+			fprintf(stderr, "Tiempo transcurrido: %lf\n", t1);
 		}	
 		else{//rango del main
 			//rangos de los otros procesos
@@ -96,14 +99,13 @@ int main(int argc, char* argv[]){
 
 			MPI_Recv(&mensaje, 1, MPI_INT, srcmain, tag, MPI_COMM_WORLD, &status);
 			mensaje=sum(valores, tamanio_vec);
-			
+			//printf("SUMAA: %d",mensaje);
 			//printf("MENSAJE PROC %d: %d\n",rank,mensaje);
-
 			MPI_Send(&mensaje, 1, MPI_INT, dst, tag, MPI_COMM_WORLD);
-		}
-
-		MPI_Finalize();
+		}	
+		MPI_Finalize();	
 		free(valores);
-		return 0;
 	}
+	
+	return 0;
 }
