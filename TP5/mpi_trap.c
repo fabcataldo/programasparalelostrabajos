@@ -2,11 +2,12 @@
 #include <string.h>
 #include <stdlib.h>
 #include "mpi.h"
+#include <math.h>
+
+#define PI 3.14159265
 
 float f(float x) {
-	float return_val;
-	return_val = x*x;
-	return return_val;
+	return sin(x);
 }
 
 int main(int argc, char* argv[]){
@@ -25,7 +26,7 @@ int main(int argc, char* argv[]){
 	float local_a,local_b,h, a, b;	
 	
 	if(rank==0){//rango del main
-		start1 = MPI_Wtime(); 
+		
 		printf("Ingrese a: \n");
 		scanf("%f", &a);
 		printf("Ingrese b: \n");
@@ -35,27 +36,32 @@ int main(int argc, char* argv[]){
 		if(n==0){
 			n=1024;	
 		}
+		//a=(3/4)*PI;
+		a=a*PI;
+		b=b*PI;
 		h=(b-a)/n;
-		
-		dst=1; //el numero del rango del primer proceso, por lo menos, es 1, los demás son >1
-		src=1;//el numero del rango del primer proceso, por lo menos, es 1, los demás son >1
-		local_n=n/p;
-		local_a=a+(rank*local_n*h);	
-		local_b=local_a+(local_n*h);
-		x = local_a;
-		h = (local_b-local_a)/local_n;
-		
-		MPI_Isend(&integral, 1, MPI_FLOAT, dst, tag, MPI_COMM_WORLD, &request);
-		MPI_Irecv(&integral, 1, MPI_FLOAT, src, tag, MPI_COMM_WORLD, &status);
-		integral = integral*h;
 
+		local_n=n/p;
+		start1 = MPI_Wtime(); 
+		for(src=1;src<p;src++){
+			dst=src;
+			MPI_Send(&integral, 1, MPI_FLOAT, dst, tag, MPI_COMM_WORLD);
+			MPI_Recv(&integral, 1, MPI_FLOAT, src, tag, MPI_COMM_WORLD, &status);
+			integral+=integral*h;
+		}
 		end1 = MPI_Wtime();
 		t1=end1-start1;
+		printf("Valor aproximado de la integral: %f\n", integral);
+		printf("Tiempo transcurrido: %lf\n", t1);
 	}
 	else{  //rangos de los otros procesos 		
 		dstmain=0;
 		dst=0;
-		MPI_Irecv(&integral, 1, MPI_FLOAT, dstmain, tag, MPI_COMM_WORLD, &status);
+		MPI_Recv(&integral, 1, MPI_FLOAT, dstmain, tag, MPI_COMM_WORLD, &status);
+
+		local_a=a+(rank*local_n*h);	
+		local_b=local_a+(local_n*h);
+		x = local_a;
 		
 		integral = (f(local_a) + f(local_b))/2.0;
 		
@@ -64,13 +70,10 @@ int main(int argc, char* argv[]){
 			integral = integral + f(x);
 		}
 		
-		printf("Proceso: %d\n", rank);
-		MPI_Isend(&integral, 1, MPI_FLOAT, dst, tag, MPI_COMM_WORLD, &request);
+		MPI_Send(&integral, 1, MPI_FLOAT, dst, tag, MPI_COMM_WORLD);
 	}	
 
 	
-	printf("Valor aproximado de la integral: %f\n", integral_resultado);
-	printf("Tiempo transcurrido: %lf\n", t1);
 
 	MPI_Finalize();
 	return 0;
