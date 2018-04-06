@@ -83,15 +83,10 @@ int main(int argc, char* argv[]){
 			start1 = MPI_Wtime(); 
 			for(src = 1; src<p; src++){
 				dst=src; //el numero del rango del primer proceso, por lo menos, es 1, los demás son >1
-			
-				//printf("VAL A BUSCAR: %d\n",valor_a_buscar);
-			
+					
 				MPI_Isend(&valor_a_buscar, 1, MPI_INT, dst, tag, MPI_COMM_WORLD, &request);
 				MPI_Wait(&request, &status);			
-				//printf("MENSAJE: %d\n",mensaje);			
-				MPI_Irecv(&mensaje, 1, MPI_INT, src, tag, MPI_COMM_WORLD, &status);
-				//printf("SRC rank %d: 	%d\n", rank,src);
-				//printf("MENSAJE: %d\n",mensaje);			
+				MPI_Irecv(&mensaje, 1, MPI_INT, src, tag, MPI_COMM_WORLD, &status);		
 				end1 = MPI_Wtime();
 				t1=end1-start1;
 				printf("índice del elemento buscado: %d\n", mensaje);
@@ -106,8 +101,6 @@ int main(int argc, char* argv[]){
 
 			MPI_Irecv(&valor_a_buscar, 1, MPI_INT, srcmain, tag, MPI_COMM_WORLD, &status);
 			mensaje=find(valor_a_buscar, valores, tamanio_vec);
-			
-			//printf("MENSAJE PROC %d: %d\n",rank,mensaje);
 
 			MPI_Isend(&mensaje, 1, MPI_INT, dst, tag, MPI_COMM_WORLD, &request);
 			MPI_Wait(&request, &status);
