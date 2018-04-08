@@ -22,14 +22,15 @@ void ver_vector(int *vector, int size){
 
 int obtener_tamanio(char* nomb_file){
 	FILE *archivo = fopen(nomb_file, "r");
-	int tamanio_vector=0;
+	int tamanio_vector;
 	int i=0;
 	
 	if (archivo == NULL)
 		return 1;
 	do{
 		fscanf(archivo, "%d", &(tamanio_vector));
-		i++;		
+		if(fgetc(archivo) == '\n')
+			break;	
 	}while((fgetc(archivo)) != '\n');
 	fclose(archivo);
 	return tamanio_vector;
@@ -40,7 +41,12 @@ void read_file(char* nomb_file, int* vector, int size){
 	int i;
 	if (fp == NULL)
 		return;
-	fseek(fp, 3, SEEK_SET);
+	if(size > 10){
+		fseek(fp, 3, SEEK_SET);
+	}
+	else{
+		fseek(fp, 2, SEEK_SET);
+	}
 	do{
 		fscanf(fp, "%d", &(vector[i]));
 		i++;		
@@ -68,7 +74,7 @@ int main(int argc, char* argv[]){
 		int tamanio_vec = obtener_tamanio(nombre_archivo);
 		int* valores = (int*)malloc(tamanio_vec*sizeof(int));
 		read_file(nombre_archivo, valores, tamanio_vec);
-
+		//ver_vector(valores, tamanio_vec);
 		int rank, p, src, dst, tag=0, srcmain;
 		int mensaje=0; //inicializo el lugar a donde va a el resultado del find()	
 		double start1,end1,t1;
@@ -79,31 +85,29 @@ int main(int argc, char* argv[]){
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 		MPI_Comm_size(MPI_COMM_WORLD, &p);
 
-		if(rank==0){
+		if(rank==0){//rango del main
 			start1 = MPI_Wtime(); 
 			for(src = 1; src<p; src++){
 				dst=src; //el numero del rango del primer proceso, por lo menos, es 1, los demás son >1
 					
-				MPI_Isend(&valor_a_buscar, 1, MPI_INT, dst, tag, MPI_COMM_WORLD, &request);
-				MPI_Wait(&request, &status);			
-				MPI_Irecv(&mensaje, 1, MPI_INT, src, tag, MPI_COMM_WORLD, &status);		
+				MPI_Send(&valor_a_buscar, 1, MPI_INT, dst, tag, MPI_COMM_WORLD);			
+				MPI_Recv(&mensaje, 1, MPI_INT, src, tag, MPI_COMM_WORLD, &status);		
 				end1 = MPI_Wtime();
-				t1=end1-start1;
-				printf("índice del elemento buscado: %d\n", mensaje);
-				fprintf(stderr, "Tiempo transcurrido: %lf\n", t1);		
+				t1=end1-start1;		
 			}
+			printf("%d\n", mensaje);
+			fprintf(stderr, "%lf\n", t1);
 			
 		}	
-		else{//rango del main
+		else{
 			//rangos de los otros procesos
 			srcmain=0;
 			dst=srcmain;
 
-			MPI_Irecv(&valor_a_buscar, 1, MPI_INT, srcmain, tag, MPI_COMM_WORLD, &status);
+			MPI_Recv(&valor_a_buscar, 1, MPI_INT, srcmain, tag, MPI_COMM_WORLD, &status);
 			mensaje=find(valor_a_buscar, valores, tamanio_vec);
 
-			MPI_Isend(&mensaje, 1, MPI_INT, dst, tag, MPI_COMM_WORLD, &request);
-			MPI_Wait(&request, &status);
+			MPI_Send(&mensaje, 1, MPI_INT, dst, tag, MPI_COMM_WORLD);
 		}
 
 		MPI_Finalize();

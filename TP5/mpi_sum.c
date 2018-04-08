@@ -29,7 +29,8 @@ int obtener_tamanio(char* nomb_file){
 		return 1;
 	do{
 		fscanf(archivo, "%d", &(tamanio_vector));
-		i++;		
+		if(fgetc(archivo) == '\n')
+			break;	
 	}while((fgetc(archivo)) != '\n');
 	fclose(archivo);
 	return tamanio_vector;
@@ -40,7 +41,12 @@ void read_file(char* nomb_file, int* vector, int size){
 	int i;
 	if (fp == NULL)
 		return;
-	fseek(fp, 3, SEEK_SET);
+	if(size > 10){
+		fseek(fp, 3, SEEK_SET);
+	}
+	else{
+		fseek(fp, 2, SEEK_SET);
+	}
 	do{
 		fscanf(fp, "%d", &(vector[i]));
 		i++;		
@@ -65,14 +71,12 @@ int main(int argc, char* argv[]){
 		int mensaje=0; //inicializo el lugar a donde va a el resultado del sum()	
 		double start1,end1,t1;
 		MPI_Status status;
-		mensaje=sum(valores, tamanio_vec);
 
 		MPI_Init(&argc, &argv);
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 		MPI_Comm_size(MPI_COMM_WORLD, &p);
 
 		if(rank==0){
-			mensaje=0;
 			start1 = MPI_Wtime(); 
 			for(src = 1; src<p; src++){
 				dst=src; //el numero del rango del primer proceso, por lo menos, es 1, los demás son >1
@@ -80,7 +84,7 @@ int main(int argc, char* argv[]){
 				MPI_Send(&mensaje, 1, MPI_INT, dst, tag, MPI_COMM_WORLD);	
 
 				MPI_Recv(&mensaje, 1, MPI_INT, src, tag, MPI_COMM_WORLD, &status);
-				mensaje+=mensaje;	
+					
 			}
 			end1 = MPI_Wtime();
 			t1=end1-start1;
