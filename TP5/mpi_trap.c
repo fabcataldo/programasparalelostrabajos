@@ -36,7 +36,6 @@ int main(int argc, char* argv[]){
 		if(n==0){
 			n=1024;	
 		}
-		//a=(3/4)*PI;
 		a=a*PI;
 		b=b*PI;
 		h=(b-a)/n;
@@ -68,12 +67,9 @@ int main(int argc, char* argv[]){
 		for(i=1;i<=local_n-1;i++){
 			x = x + h;
 			integral = integral + f(x);
-		}
-		
+		}		
 		MPI_Send(&integral, 1, MPI_FLOAT, dst, tag, MPI_COMM_WORLD);
 	}	
-
-	
 
 	MPI_Finalize();
 	return 0;
