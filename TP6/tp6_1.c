@@ -25,7 +25,8 @@ void cargar_matriz(int* matriz, int size){
 
 
 void generaroutput(FILE *ptrfile, int *matriz, int f, int c, int nproc, char *descripcionmatriz){
-
+	//funcion que recibe el puntero, la matriz a guardar, junto con sus filas y columnas, y la descripción de lo que se quiere guardar
+	//por ej "Matriz inicial"
 	int i, j;
 	fprintf(ptrfile,"Proceso %d\n",nproc);
 	fprintf(ptrfile,"%s\n",descripcionmatriz);
@@ -53,9 +54,12 @@ int main(int argc, char *argv[]){
 		return 1;
 	}
 
+	//Genero un arreglo de punteros FILE para cada proceso
 	FILE *ptrsfiles[SIZEPROC];
 	char nombrearchivo[9];
+	//Genero el nombre del archivo y la extensión
 	sprintf(nombrearchivo,"%s.%d","output",rank);
+	//abro el archivo que corresponda para el puntero FILE del proceso que corresponda
 	ptrsfiles[rank]=fopen(nombrearchivo,"w+");
 	char descripcionmatriz[10];
 
