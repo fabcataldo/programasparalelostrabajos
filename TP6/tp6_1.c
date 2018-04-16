@@ -150,8 +150,8 @@ int main(int argc, char *argv[]){
 	
 	MPI_Datatype columnasintercaladas,ciresized;
 	//mpi_type_vector(cant de bloques, tamaño de cada bloque, distancia entre bloque y bloque, etc...)	
-	//voy a crear un tipo que va a tener 8 bloques de 2 elementos, que va a estar separado de a 1 elemento (sacando los bloques
-	//correspondientes de la matriz)
+	//voy a crear un tipo que va a tener 16 bloques de 1 elementos, que va a estar separado de a 4 elementos
+	//o sea por ej el proceso 0 va a recibir la primera columna y la cuarta, el proceso 1 la segunda y la quinta, y asi
 	//si por ej tengo cuatro columnas A,B,C,D, el primer proc va a recibir A y C, luego B y D
 	MPI_Type_vector(SIZEMAT*2, 1, SIZEMAT/2, MPI_INT, &columnasintercaladas);
 	//el nuevo tipo va a ser "resizerado", con un limite inferior de 0 y un limite superior de 8*sizeof(int)
