@@ -147,14 +147,13 @@ int main(int argc, char *argv[]){
 	MPI_Type_free(&filasintercaladas);
 	MPI_Type_free(&newfilasintercaladas);
 
-	//POR IMPLEMENTARRRRR
-	/*
+	
 	MPI_Datatype columnasintercaladas,ciresized;
 	//mpi_type_vector(cant de bloques, tamaño de cada bloque, distancia entre bloque y bloque, etc...)	
 	//voy a crear un tipo que va a tener 8 bloques de 2 elementos, que va a estar separado de a 1 elemento (sacando los bloques
 	//correspondientes de la matriz)
 	//si por ej tengo cuatro columnas A,B,C,D, el primer proc va a recibir A y C, luego B y D
-	MPI_Type_vector(SIZEMAT, 2, 1, MPI_INT, &columnasintercaladas);
+	MPI_Type_vector(SIZEMAT*2, 1, SIZEMAT/2, MPI_INT, &columnasintercaladas);
 	//el nuevo tipo va a ser "resizerado", con un limite inferior de 0 y un limite superior de 8*sizeof(int)
 	MPI_Type_create_resized(columnasintercaladas, 0, SIZEMAT*sizeof(int), &ciresized);
 	MPI_Type_commit(&ciresized);
@@ -166,8 +165,9 @@ int main(int argc, char *argv[]){
 	generaroutput(ptrsfiles[rank], b, SIZEMAT, 2, rank, "Columnas intercaladas");	
 	free(b);
 	MPI_Type_free(&columnasintercaladas);
-	*/
 
+
+	//POR IMPLEMENTARRRRR
 	/*
 	MPI_Datatype submatriz;
 	MPI_Type_vector(SIZEMAT/2, 1, SIZEMAT/2, MPI_INT, &submatriz);
