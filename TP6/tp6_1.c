@@ -63,7 +63,7 @@ int main(int argc, char *argv[]){
 	ptrsfiles[rank]=fopen(nombrearchivo,"w+");
 	char descripcionmatriz[10];
 
-	int source=0, dest,tag=1, i,j,k;
+	int source=0, dest,tag=1, i,j;
 	//matriz inicial
 	int* a = (int*)malloc(SIZEMAT*SIZEMAT*sizeof(int));
 	//buffer de recepción de cada proceso
@@ -166,32 +166,28 @@ int main(int argc, char *argv[]){
 	free(b);
 	MPI_Type_free(&columnasintercaladas);
 
+	
+	MPI_Datatype submatriz, newsubmatriz;
+	//4 bloques de 4 elementos, y se va a ir contando de a SIZEMAT elementos en la matriz para conseguir los 4 bloques
+	MPI_Type_vector(SIZEMAT/2, SIZEMAT/2, SIZEMAT, MPI_INT, &submatriz);
+	//creo un nuevo tipo "create_resized" en el cual le defino los límites 0, y SIZEMAT/2*SIZEMAT/2 ya que cada proceso va a recibir una matriz de 4x4
+	MPI_Type_create_resized(submatriz, 0, (SIZEMAT/2)*(SIZEMAT/2)*sizeof(int),&newsubmatriz);
+	MPI_Type_commit(&newsubmatriz);
 
-	//POR IMPLEMENTARRRRR
-	/*
-	MPI_Datatype submatriz;
-	MPI_Type_vector(SIZEMAT/2, 1, SIZEMAT/2, MPI_INT, &submatriz);
-	MPI_Type_commit(&submatriz);
 	b = (int*)malloc((SIZEMAT/2)*(SIZEMAT/2)*sizeof(int));
-
+	//creo el arreglo de abajo para marcarle a MPI_Send desde donde tiene que mandar las submatrices
+	int desplacements[]={0, SIZEMAT/2, SIZEMAT*SIZEMAT/2, (SIZEMAT*SIZEMAT/2) + SIZEMAT/2};
 	if (rank == 0) {
-		for (i=1; i<=SIZEPROC; i++) {
-		       MPI_Send(a, 1, MPI_INT, i, tag, MPI_COMM_WORLD);
-		}
+		//MPI_Scatter(a, 1, newsubmatriz, b, (SIZEMAT/2) * (SIZEMAT/2), MPI_INT, 0, MPI_COMM_WORLD);	
+		for(i=0;i<SIZEPROC;i++)
+			MPI_Send(a+desplacements[i], 1, newsubmatriz, i, tag, MPI_COMM_WORLD);
   	}
-	else{
-		printf("\nSubmatriz\n");
-		MPI_Recv(b, (SIZEMAT/2)*(SIZEMAT/2), submatriz, source, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-		for(i=0;i<8;i++){
-			for(j=0;j<8;j++){
-				printf("b= %d ",b[(i*8)+j]);
-			}
-			printf("\n");
-		}
-		free(b);
-	}
+	MPI_Recv(b, SIZEMAT/2 * SIZEMAT/2, MPI_INT, source, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+	generaroutput(ptrsfiles[rank], b, SIZEMAT/2, SIZEMAT/2, rank, "Submatriz");
+	free(b);
+
 	MPI_Type_free(&submatriz);
-	*/	
+		
 	free(a);
 	fclose(ptrsfiles[rank]);
 	MPI_Finalize();
