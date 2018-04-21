@@ -89,12 +89,17 @@ int main(int argc, char *argv[]){
 
 
 	b = (int*)malloc(SIZEMAT*2*sizeof(int));
-	MPI_Datatype porcolumnas;
+	MPI_Datatype porcolumnas, newcolumnas;
 	//defino el nuevo tipo de datos "porcolumnas"
-	MPI_Type_contiguous(SIZEMAT*2, MPI_INT, &porcolumnas);
-	MPI_Type_commit(&porcolumnas);
-	//mando 2 columnas de 8 elementos a cada proceso, y cada proceso va a recibirlos en el buffer b
-	MPI_Scatter(a, (SIZEMAT*SIZEMAT)/SIZEPROC, MPI_INT, b, (SIZEMAT*SIZEMAT)/SIZEPROC, porcolumnas, 0, MPI_COMM_WORLD);	
+	//mando 8 bloques de dos elementos, cuento cada SIZEMAT, y MPI_INT es el oldtype
+	MPI_Type_vector(SIZEMAT, SIZEMAT/p, SIZEMAT, MPI_INT, &porcolumnas);
+	//el nuevo tipo va a ser "resizerado", con un limite inferior de 0 y un limite superior de 2*sizeof(int) (dos columnas de enteros)
+	//MPI_Type_create_resized(old_type, MPI_Aint nuevo_limite_inferior, MPI_Aint tamaño_del_nuevo_tipo_que_extiende_del_tipo_viejo, nuevo_tipo)
+	MPI_Type_create_resized(porcolumnas, 0, 2*sizeof(int), &newcolumnas);
+	MPI_Type_commit(&newcolumnas);
+	//mando a pero de la forma que indique newcolumnas, y en b se va a recibir 2 columnas de 8 elementos enteros en cada proceso (64/4=16)
+	MPI_Scatter(a, 1, newcolumnas, b, (SIZEMAT*SIZEMAT)/SIZEPROC, MPI_INT, 0, MPI_COMM_WORLD);	
+	//imprimo en cada archivo en forma de columnas, las columnas correspondientes
 	generaroutput(ptrsfiles[rank], b, SIZEMAT, 2, rank, "Por columnas");
 	free(b);
 	MPI_Type_free(&porcolumnas);
