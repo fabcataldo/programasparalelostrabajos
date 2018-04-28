@@ -43,7 +43,7 @@ void calculoiterativo(int *vector, int size, int valormenosuno, int valormasuno)
 	else
 		vector[0]=1;
 
-	//paralelizo este for, poniendo por defecto en private el i solamente, entonces el i en los hilos no se va a ver pisado
+	//paralelizo este for, poniendo por defecto la variable i como privada solamente, entonces el i en los hilos no se va a ver afectado
 	//consideré utilizar la cláusula schedule ya que quiero definir un manejo de hilos dinámico, y utilizo un chunk=size/2, para, por ej
 	//para cada hilo, le toca chunk iteraciones
 	int chunk=size/2;
