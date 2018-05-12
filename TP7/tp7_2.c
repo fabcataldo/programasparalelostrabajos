@@ -6,12 +6,13 @@
 #define ANCHOMPRC (size/p_cols)
 #define ALTOMPRC (size/p_rows)
 
-double temp_fuente = 40;
+double temp_fuente = 60;
 int coord_fuente_x = 1;
 int coord_fuente_y = 1;
 int iteraciones = 100000;
 int size = 100;
-double delta = 0.0;
+double delta = 0; //si delta queda como 0, la matriz principal debe seguir evolucionando hasta llegar a las 100000 iterac, si no, se corta hasta que
+//la matriz se "estabilice" (cuando el max sea menor o igual al error por iteracion)
 int p_cols=1;
 
 
@@ -100,7 +101,7 @@ void versubmatriz(double *m, int f, int c){
 }
 
 void generararchivo(double* matriz, int size) {
-	FILE *ptrfile=fopen("outputmpi.dat","w+");
+	FILE *ptrfile=fopen("outputmpifinale.dat","w+");
 	int i,j;
 	for(i=0;i<size;i++){
 		for(j=0;j<size;j++){
@@ -111,15 +112,34 @@ void generararchivo(double* matriz, int size) {
 	fclose(ptrfile);
 }
 
-void calculoiterativo(double *mnueva, double* mvieja, int p_rows){
+void calculoiterativo(double *mnueva, double* mvieja, int p_rows, double* max){
 	int i, j;
 
+	//devuelvo el error, para una iteración particular, para un proceso en particular
+	double difer;
 	for(i=1;i<ALTOMPRC+1;i++){
 		for(j=1;j<ANCHOMPRC+1;j++){
-				mnueva[i*size+j]=(mvieja[( (i-1)*(ANCHOMPRC+2) )+j] + mvieja[(i*(ANCHOMPRC+2))+(j+1)] + mvieja[((i+1)*(ANCHOMPRC+2))+j]+mvieja[(i*(ANCHOMPRC+2))+(j-1)]) /4;		
+				mnueva[i*ANCHOMPRC+j]=(mvieja[( (i-1)*(ANCHOMPRC+2) )+j] + mvieja[(i*(ANCHOMPRC+2))+(j+1)] + mvieja[((i+1)*(ANCHOMPRC+2))+j]+mvieja[(i*(ANCHOMPRC+2))+(j-1)]) /4;			
+
+				//if((mnueva[i*size+j] != mvieja[i*size+j]) && !(i==coord_fuente_x && i==coord_fuente_y)){
+				if((delta!=0) && !(i==coord_fuente_x && i==coord_fuente_y)){
+					difer=mnueva[(i*(ANCHOMPRC+2))+j]-mvieja[(i*(ANCHOMPRC+2))+j];
+					if(difer>*max){
+						*max=difer;				
+					}
+				}
+				else{
+					difer=mvieja[(i*(ANCHOMPRC+2))+j]-mnueva[(i*(ANCHOMPRC+2))+j];
+					if(difer>*max){
+						*max=difer;				
+					}				
+				}
 		}	
+
 	}
+
 	
+	//return max;
 }
 
 
@@ -146,17 +166,20 @@ int main(int argc, char **argv){
 	int p_rows=np/p_cols;
 	//matriz original
 	double* matriz = (double*) calloc((size)*(size),sizeof(double));
-	//submatriz para cada proceso, pero "viejo"; conformarían lo que le tengo que pasar a cada proceso según corresponda
-	//(según los ifs del for
+	//submatriz para cada proceso, pero "viejo"
 	double* matriz_vieja = (double*)calloc((ALTOMPRC+2)*(ANCHOMPRC+2),sizeof(double));
 	//submatriz para cada proceso, pero ya calculado, a partir de "matriz_vieja"
 	double* matriz_actual = (double*)calloc((ALTOMPRC+2)*(ANCHOMPRC+2),sizeof(double));
 
+	//calculo a donde debería estar la fuente
 	int rank_fuente = ((coord_fuente_x/ALTOMPRC)*p_cols)+(coord_fuente_y/ANCHOMPRC);
 
 	int i,j,src, iter;
-	//double error=0.0; //sería el error
+	double error_rank=0; //sería el error de cada rank	
+	double *perr_r;
+	double error_total=0; //sumo todos los error_rank con MPI_Reduce(), y guardo el resultado acá;
 	
+	//compruebo a cual proceso corresponde la fuente, y la guardo
 	if(rank==rank_fuente){
 		matriz_vieja[((coord_fuente_x%ALTOMPRC)+1 * (ANCHOMPRC+2)) + (coord_fuente_y%ANCHOMPRC+1)]=temp_fuente;	
 	}
@@ -188,10 +211,13 @@ int main(int argc, char **argv){
 	MPI_Type_create_resized(submatcol, 0, (ANCHOMPRC+2)*sizeof(double),&nsubmatcol);
 	MPI_Type_commit(&nsubmatcol);
 
+	int flag=0;
 	double* aux;
-	//int flag=0;
 
 	for(iter=0;iter<iteraciones;iter++){
+		error_rank=0;
+		perr_r=&error_rank;
+
 		if(n!=-1){
 			//mando la primera fila sin ceros al proceso que sigue
 			//MPI_Isend(matriz_vieja+ANCHOMPRC+2, (ANCHOMPRC+2), MPI_DOUBLE, n, tag, MPI_COMM_WORLD,&req); 
@@ -200,34 +226,29 @@ int main(int argc, char **argv){
 			//printf("FLAG : %d",flag);
 
 			//recibo del proc anterior a mi su última fila sin ceros, en mi primera fila que tiene ceros
-			//MPI_Irecv(matriz_vieja, ANCHOMPRC+2, MPI_DOUBLE, n, tag, MPI_COMM_WORLD, &req);	
 			MPI_Recv(matriz_vieja, ANCHOMPRC+2, MPI_DOUBLE, n, tag, MPI_COMM_WORLD, &sts);	
-
 			//MPI_Test(&req, &flag, &sts);
-			//printf("FLAG : %d",flag);
+			//printf("FLAG : %d\n",flag);
+
 		}
 		if(s!=-1){
 			//mando la última fila sin ceros al proceso que corresponda
 			//MPI_Isend(matriz_vieja+(ALTOMPRC*(ANCHOMPRC+2)), ANCHOMPRC+2, MPI_DOUBLE, s, tag, MPI_COMM_WORLD, &req);
-			MPI_Send(matriz_vieja+(ALTOMPRC*(ANCHOMPRC+2)), ANCHOMPRC+2, MPI_DOUBLE, s, tag, MPI_COMM_WORLD);
 			//MPI_Test(&req, &flag, &sts);
-			//printf("FLAG : %d",flag);
-
-			//recbio en mi última fila con ceros lo que me venga del proc que me sigue, o sea, la primera fila sin ceros del proceso que sigue
-			//MPI_Irecv(matriz_vieja+((ALTOMPRC+1)*(ANCHOMPRC+2)), ANCHOMPRC+2, MPI_DOUBLE, s, tag, MPI_COMM_WORLD, &req);
+			//printf("FLAG : %d\n",flag);
+			MPI_Send(matriz_vieja+(ALTOMPRC*(ANCHOMPRC+2)), ANCHOMPRC+2, MPI_DOUBLE, s, tag, MPI_COMM_WORLD);
+			//recbio en mi última fila con ceros lo que me venga del proc que me sigue, o sea, la primera fila sin ceros del proceso que sigue	
 			MPI_Recv(matriz_vieja+((ALTOMPRC+1)*(ANCHOMPRC+2)), ANCHOMPRC+2, MPI_DOUBLE, s, tag, MPI_COMM_WORLD, &sts);
 			//MPI_Test(&req, &flag, &sts);
-			//printf("FLAG : %d",flag);
+			//printf("FLAG : %d\n",flag);
 		}
 		if(e!=-1){
 			//mando la última columna sin ceros al proceso que corresponda
 			//MPI_Isend(matriz_vieja+ANCHOMPRC, 1, nsubmatcol, rank+1, tag, MPI_COMM_WORLD, &req);
-			MPI_Send(matriz_vieja+ANCHOMPRC, 1, nsubmatcol, rank+1, tag, MPI_COMM_WORLD);
 			//MPI_Test(&req, &flag, &sts);
-			//printf("FLAG : %d",flag);
-
+			//printf("FLAG : %d\n",flag);
+			MPI_Send(matriz_vieja+ANCHOMPRC, 1, nsubmatcol, rank+1, tag, MPI_COMM_WORLD);
 			//recbio en mi última columna con ceros lo que me venga del proceso que sigue, o sea, la primera columna del proceso que sigue
-			//MPI_Irecv(matriz_vieja+ANCHOMPRC+1, 1, nsubmatcol, rank+1, tag, MPI_COMM_WORLD, &req);	
 			MPI_Recv(matriz_vieja+ANCHOMPRC+1, 1, nsubmatcol, rank+1, tag, MPI_COMM_WORLD, &sts);	
 		}
 		if(w!=-1){
@@ -235,24 +256,31 @@ int main(int argc, char **argv){
 			//MPI_Isend(matriz_vieja+1, 1, nsubmatcol, rank-1, tag, MPI_COMM_WORLD, &req);
 			MPI_Send(matriz_vieja+1, 1, nsubmatcol, rank-1, tag, MPI_COMM_WORLD);
 			//recbio en mi primera columna con ceros lo que me venga de la izquierda, o sea, la última columna del proceso anterior a mi
-			//MPI_Irecv(matriz_vieja, 1, nsubmatcol, rank-1, tag, MPI_COMM_WORLD, &req);	
 			MPI_Recv(matriz_vieja, 1, nsubmatcol, rank-1, tag, MPI_COMM_WORLD, &sts);	
 		}
-		//MPI_Wait(&req, MPI_STATUS_IGNORE);
+
 		
 		if(rank==rank_fuente){
 			matriz_actual[((coord_fuente_x%ALTOMPRC)+1 * (ANCHOMPRC+2)) + (coord_fuente_y%ANCHOMPRC+1)]=temp_fuente;	
 		}
-		calculoiterativo(matriz_actual,matriz_vieja, p_rows);
+
+		calculoiterativo(matriz_actual,matriz_vieja, p_rows, perr_r);
 
 		aux=matriz_actual;
 		matriz_actual=matriz_vieja;
 		matriz_vieja=aux;
+
+		//versubmatriz(mvieja, ALTOMPRC+2, ANCHOMPRC+2);
+		//versubmatriz(matriz_actual, ALTOMPRC+2, ANCHOMPRC+2);
+				
+		//printf("\nError_rank: %lf",error_rank);
+		MPI_Allreduce(&error_rank, &error_total, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+		//printf("\nError_total: %lf\n",error_total);
+		if(delta!=0 && error_total<=delta){
+			break;		
+		}
+		
 	}
-
-
-	//printf("\nSubmatriz proc %d\n", rank);
-	//versubmatriz(aux, ALTOMPRC, ANCHOMPRC);	
 
 	if(rank==0){
 		//Primero paso el resultado de lo que hizo el proceso 0 a la matriz principal
@@ -265,24 +293,20 @@ int main(int argc, char **argv){
 		//Ahora recibo el resto de las submatrices y lo paso a la matriz principal
 		for(src=1;src<np;src++){			
 			if(src==1){
-				MPI_Recv(matriz+(ANCHOMPRC*src), ALTOMPRC*ANCHOMPRC, MPI_DOUBLE, src, tag, MPI_COMM_WORLD, &sts);	
-				//MPI_Test(&req, &flag, &sts);	
-				//printf("FLAG : %d",flag);	
-				//MPI_Recv(matriz+(ANCHOMPRC*src), 1, nsubmp, rank+1, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);				
+				MPI_Recv(matriz+(ANCHOMPRC*src), ALTOMPRC*ANCHOMPRC, MPI_DOUBLE, src, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);				
 			}
 			else{
-				MPI_Recv(matriz+(ANCHOMPRC*src)+size, ALTOMPRC*ANCHOMPRC, MPI_DOUBLE, src, tag, MPI_COMM_WORLD, &sts);		
-				//MPI_Test(&req, &flag, &sts);	
-				//printf("FLAG : %d",flag);	
-		
-				//MPI_Recv(matriz+(ANCHOMPRC*src)+size, 1, nsubmp, rank+1, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);				
+				MPI_Recv(matriz+(ANCHOMPRC*src)+size, ALTOMPRC*ANCHOMPRC, MPI_DOUBLE, src, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);		
 			}
-			
 		}
-		//MPI_Type_free(&nsubmp);
-		printf("Tiempo transcurrido: %f\n", MPI_Wtime()-start_t);
+		
+		
+	
+		printf("Tiempo transcurrido: %f\n", MPI_Wtime()-start_t);	
+		generararchivo(matriz, size);	
 		printf("Iteraciones realizadas: %d\n", iteraciones);
-		generararchivo(matriz, size);
+		printf("Error: %lf\n", error_total);
+
 	}
 	else{
 		//NO soy el proceso 0, si no otro proceso
@@ -295,9 +319,9 @@ int main(int argc, char **argv){
 
 		//le envío mi submatriz ya calculada al proc 0 para que lo guarde en la matriz principal
 		MPI_Send(aux+ANCHOMPRC+3, 1, nsubmtp, 0, tag, MPI_COMM_WORLD);
-
 		MPI_Type_free(&nsubmtp);
 	}
+
 	
 	MPI_Type_free(&nsubmatcol);
 	
