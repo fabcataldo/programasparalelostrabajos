@@ -62,19 +62,19 @@ void controlarsetearargumentosprog(int argc, char** argv){
 		   		break;
 		}
 	    }
-	    coordtempfuentex = atoi(argv[optind]);
-	    coordtempfuentey = atoi(argv[optind+1]);
-	    tempfuente = atof(argv[optind+2]);  
-	if(coordtempfuentex<0 || coordtempfuentex>=size || coordtempfuentey<0 || coordtempfuentey>=size ){
+	    coord_fuente_x = atoi(argv[optind]);
+	    coord_fuente_y = atoi(argv[optind+1]);
+	    temp_fuente = atof(argv[optind+2]);  
+	if(coord_fuente_x<0 || coord_fuente_x>=size || coord_fuente_y<0 || coord_fuente_y>=size ){
 		printf("Valores de posición inválidos.\n");
 		printf("<x> e <y> indican la posición de la fuente de calor.\n");
 		exit(1);
 	}
 
-	coordtempfuentex++;
-	coordtempfuentey++;
+	coord_fuente_x++;
+	coord_fuente_x++;
 	size+=2;
-	if(tempfuente < 0.){
+	if(temp_fuente < 0.){
 		printf("La temperatura de la fuente de calor debe ser mayor a 0.\n");
 		exit(1);
  	}
