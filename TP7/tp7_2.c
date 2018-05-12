@@ -14,6 +14,7 @@ int size = 100;
 double delta = 0; //si delta queda como 0, la matriz principal debe seguir evolucionando hasta llegar a las 100000 iterac, si no, se corta hasta que
 //la matriz se "estabilice" (cuando el max sea menor o igual al error por iteracion)
 int p_cols=1;
+char* nombrearchivo="output.txt";
 
 
 //argumentos con valores por defecto, como variables globales
@@ -28,7 +29,7 @@ char* nombrearchivo="output.txt";
 int p_cols=1;
 */
 
-/*
+
 void controlarsetearargumentosprog(int argc, char** argv){
 	if(argc < 4){
 		printf("Debe ingresar al menos 3 argumentos de la siguiente forma:\n");
@@ -78,7 +79,7 @@ void controlarsetearargumentosprog(int argc, char** argv){
 		exit(1);
  	}
 }
-*/
+
 
 void vermatriz(double *m, int size){
 	int i,j;
@@ -151,11 +152,11 @@ int main(int argc, char **argv){
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	MPI_Comm_size(MPI_COMM_WORLD, &np);
 	
-	/*
+	
 	if(rank==0){
 		controlarsetearargumentosprog(argc, argv);
 	}
-	*/
+	
 	if(np!=4){
 		if(rank==0){
 			printf("Se debe especificar 4 procesos");		
