@@ -176,12 +176,10 @@ int main(int argc, char **argv){
 				matriz_res[i*size+j]=subm_res[i*COLMP+j];
 			}
 		}		
-		vermatriz(matriz_res, size);
+		
 		for(src=1;src<np;src++){
 			MPI_Recv(matriz_res+offst[i], 1, nres, src, tag, MPI_COMM_WORLD, &sts);		
-			printf("\n");
-			printf("src: %d\n", src);	
-			vermatriz(matriz_res, size);
+		
 		}				
 	}
 	
