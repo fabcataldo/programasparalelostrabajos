@@ -161,9 +161,7 @@ int main(int argc, char **argv){
 	if(rank==0){
 		generar_input(nomb_file, size);
 		read_file(nomb_file, matriz_1, matriz_2, size);
-		//vermatriz(matriz_1, size);	
-		//printf("\n");
-		//vermatriz(matriz_2, size);	
+
 	}
 
 	//el proceso 0 envía a todos (incluso se envía a él mismo) la submatriz a calcular, junto con la submatriz resultado
@@ -171,7 +169,6 @@ int main(int argc, char **argv){
 	MPI_Type_vector(FILMP, COLMP, size, MPI_INT, &submp);
 	MPI_Type_create_resized(submp, 0, COLMP*sizeof(int),&nsubmp);
 	MPI_Type_commit(&nsubmp);
-	//printf("Enviando matrices\n");
 	int offst[4]={0, COLMP, size*(size/COLMP), size*(size/COLMP)+COLMP};
 	if(rank==0){
 		for(i=0;i<np;i++){
@@ -181,8 +178,7 @@ int main(int argc, char **argv){
 
 	//Ahora, todos los procesos reciben las submatrices que le corresponden, en la matriz_1
 	MPI_Recv(subm_1, FILMP*COLMP, MPI_INT, 0, tag, MPI_COMM_WORLD, &sts);
-	//printf("\nsubmatriz_1 proceso %d\n",rank);
-	//versubmatriz(subm_1, FILMP, COLMP);
+
 
 	if(rank==0){
 		for(i=0;i<np;i++){
@@ -196,12 +192,6 @@ int main(int argc, char **argv){
 
 	//luego, todos se ponen a calcular, llamando a matmul(), y almacenando el resultado en subm_res
 	matmul(subm_1, subm_2, subm_res, FILMP, COLMP);
-
-	
-	//int flag=0;	
-	//MPI_Test(&req, &flag, &sts);
-	//printf("FLAG : %d",flag);
-
 	
 	MPI_Send(subm_res, FILMP*COLMP, MPI_INT, 0, tag, MPI_COMM_WORLD);			
 
