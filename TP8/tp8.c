@@ -19,6 +19,10 @@ void controlarargumentos(int argc, char** argv){
 		printf("* <size> se refiere al tamaño de la matriz  (default: 4).\n");
 		exit(1);
 	}
+	if(np>4){
+		printf("Debe especificar una cantidad de procesos menor o igual a 4.");		
+		exit(1);
+	}	
 	filas_grilla=atoi(argv[1]);
 	columnas_grilla=atoi(argv[2]);
 	size=atoi(argv[3]);
