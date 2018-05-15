@@ -15,26 +15,32 @@ void controlarargumentos(int argc, char** argv){
 	if(argc < 4){
 		printf("Debe ingresar al menos 3 argumentos de la siguiente forma:\n");
 		printf("mpirun -np <cantidad_de_procesos> nombre_ejecutable_programa <filas_grilla> <columnas_grilla> <size>\n");
-		printf("* <filas_grilla> e <columnas_grilla> se refieren al tamaño de las submatrices que surgen de la matriz (default: 2 2).\n");
+		printf("* <filas_grilla> e <columnas_grilla> se refieren al tamaño de las submatrices que surgen de la matriz (default: filas_grilla=2, columnas_grilla=2).\n");
 		printf("* <size> se refiere al tamaño de la matriz  (default: 4).\n");
 		exit(1);
 	}
 	if(np>4){
 		printf("Debe especificar una cantidad de procesos menor o igual a 4.");		
 		exit(1);
-	}	
-	filas_grilla=atoi(argv[1]);
-	columnas_grilla=atoi(argv[2]);
-	size=atoi(argv[3]);
-	if(size!=0 && size<2){
+	}
+	
+	if(filas_grilla!=0){
+		filas_grilla=atoi(argv[1]);
+	}
+	if(columnas_grilla!=0){
+		columnas_grilla=atoi(argv[2]);
+	}
+	if(size!=0){
+		size=atoi(argv[3]);
+	}
+
+	if(size<2){
 		printf("El tamaño de las matrices tiene que ser mayor o igual a 2.");	
 		exit(1);
 	}
-	if(filas_grilla!=0 && columnas_grilla!=0){
-		if(filas_grilla>size || columnas_grilla>size){
-			printf("Algunas de las dimensiones de las submatrices es mayor al tamaño de la matriz.");	
-			exit(1);		
-		}
+	if(filas_grilla>size || columnas_grilla>size){
+		printf("Algunas de las dimensiones de las submatrices es mayor al tamaño de la matriz.");	
+		exit(1);		
 	}
 }
 
@@ -79,6 +85,27 @@ void read_file(char* nomb_file, int* m, int* m2, int size){
 	fclose(fp);
 }
 
+void generar_input(char* nomb_file, int size){
+	FILE *ptrfile2=fopen(nomb_file,"w+");
+	int i,j;
+	int num;
+	for(i=0;i<size;i++){
+		for(j=0;j<size;j++){
+			num=1+rand()%(101-1);
+			fprintf(ptrfile2,"%d ", num);				
+		}
+		fprintf(ptrfile2, "\n");
+	}
+	for(i=0;i<size;i++){
+		for(j=0;j<size;j++){
+			num=1+rand()%(101-1);
+			fprintf(ptrfile2,"%d ", num);				
+		}
+		fprintf(ptrfile2, "\n");
+	}
+	fclose(ptrfile2);	
+}
+
 void generar_archivo(int* matriz, int size) {
 	FILE *ptrfile=fopen("matrix.output","w+");
 	int i,j;
@@ -115,9 +142,11 @@ int main(int argc, char **argv){
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	MPI_Comm_size(MPI_COMM_WORLD, &np);
 	
+	
 	if(rank==0){
 		controlarargumentos(argc, argv);
 	}
+	
 
 	int* matriz_1 = (int*)calloc(size*size,sizeof(int));
 	int* matriz_2 = (int*)calloc(size*size,sizeof(int));
@@ -130,7 +159,11 @@ int main(int argc, char **argv){
 	int i,j,src;
 
 	if(rank==0){
+		generar_input(nomb_file, size);
 		read_file(nomb_file, matriz_1, matriz_2, size);
+		//vermatriz(matriz_1, size);	
+		//printf("\n");
+		//vermatriz(matriz_2, size);	
 	}
 
 	//el proceso 0 envía a todos (incluso se envía a él mismo) la submatriz a calcular, junto con la submatriz resultado
@@ -138,6 +171,7 @@ int main(int argc, char **argv){
 	MPI_Type_vector(FILMP, COLMP, size, MPI_INT, &submp);
 	MPI_Type_create_resized(submp, 0, COLMP*sizeof(int),&nsubmp);
 	MPI_Type_commit(&nsubmp);
+	//printf("Enviando matrices\n");
 	int offst[4]={0, COLMP, size*(size/COLMP), size*(size/COLMP)+COLMP};
 	if(rank==0){
 		for(i=0;i<np;i++){
@@ -147,6 +181,8 @@ int main(int argc, char **argv){
 
 	//Ahora, todos los procesos reciben las submatrices que le corresponden, en la matriz_1
 	MPI_Recv(subm_1, FILMP*COLMP, MPI_INT, 0, tag, MPI_COMM_WORLD, &sts);
+	//printf("\nsubmatriz_1 proceso %d\n",rank);
+	//versubmatriz(subm_1, FILMP, COLMP);
 
 	if(rank==0){
 		for(i=0;i<np;i++){
@@ -157,12 +193,19 @@ int main(int argc, char **argv){
 	//Ahora, todos los procesos reciben las submatrices que le corresponden, en la matriz_2
 	MPI_Recv(subm_2, FILMP*COLMP, MPI_INT, 0, tag, MPI_COMM_WORLD, &sts);
 
+
 	//luego, todos se ponen a calcular, llamando a matmul(), y almacenando el resultado en subm_res
 	matmul(subm_1, subm_2, subm_res, FILMP, COLMP);
 
+	
+	//int flag=0;	
+	//MPI_Test(&req, &flag, &sts);
+	//printf("FLAG : %d",flag);
 
-	//mando la submatriz resolución al proceso master	
-	MPI_Send(subm_res, FILMP*COLMP, MPI_INT, 0, tag, MPI_COMM_WORLD);
+	
+	MPI_Send(subm_res, FILMP*COLMP, MPI_INT, 0, tag, MPI_COMM_WORLD);			
+
+
 	//RECIBO DATOS:
 	if(rank==0){
 		for(i=0;i<FILMP;i++){
