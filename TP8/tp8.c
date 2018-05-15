@@ -35,10 +35,6 @@ void controlarargumentos(int argc, char** argv){
 			printf("Algunas de las dimensiones de las submatrices es mayor al tamaño de la matriz.");	
 			exit(1);		
 		}
-		if(filas_grilla*columnas_grilla!=np){
-			printf("El producto de las dimensiones de las submatrices no es igual a la cantidad de procesos especificada.");	
-			exit(1);		
-		}
 	}
 }
 
