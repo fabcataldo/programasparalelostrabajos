@@ -35,12 +35,25 @@ void controlarargumentos(int argc, char** argv){
 	}
 
 	if(size<2){
-		printf("El tamaño de las matrices tiene que ser mayor o igual a 2.");	
+		printf("El tamaño de las matrices tiene que ser mayor o igual a 2.\n");	
 		exit(1);
 	}
 	if(filas_grilla>size || columnas_grilla>size){
-		printf("Algunas de las dimensiones de las submatrices es mayor al tamaño de la matriz.");	
+		printf("Algunas de las dimensiones de las submatrices es mayor al tamaño de la matriz.\n");	
 		exit(1);		
+	}
+
+	if(filas_grilla!=columnas_grilla){
+		printf("Este programa multiplica matrices cuadradas. Las dimensiones de las submatrices son distintas, esto se traduce a matrices no cuadradas. Las dimensiones especificadas son inválidas.\n");	
+		exit(1);
+	}
+	//casos por ejemplo de 2 matrices de 100x100, que si por ej uso un número de procesos igual a 4, dichas matrices se dividirían
+	//en forma razonable y entendible en 4 submatrices de 25x25, por eso esta restricción
+	if(size>=10 && np>=4 && np<size){
+		if(filas_grilla!=np && columnas_grilla!=np){
+			printf("Dimensiones inválidas. Lo que se recomienda es que éstas sean iguales a la cantidad de procesos especificada, ya que luego se van a utilizar para armar las submatrices correspondientes.\n");	
+			exit(1);	
+		}	
 	}
 }
 
@@ -161,7 +174,6 @@ int main(int argc, char **argv){
 	if(rank==0){
 		generar_input(nomb_file, size);
 		read_file(nomb_file, matriz_1, matriz_2, size);
-
 	}
 
 	//el proceso 0 envía a todos (incluso se envía a él mismo) la submatriz a calcular, junto con la submatriz resultado
@@ -169,7 +181,17 @@ int main(int argc, char **argv){
 	MPI_Type_vector(FILMP, COLMP, size, MPI_INT, &submp);
 	MPI_Type_create_resized(submp, 0, COLMP*sizeof(int),&nsubmp);
 	MPI_Type_commit(&nsubmp);
-	int offst[4]={0, COLMP, size*(size/COLMP), size*(size/COLMP)+COLMP};
+	int offst[np];
+	offst[0]=0;
+	offst[1]=COLMP;
+	offst[2]=size*(size/COLMP);
+	offst[3]=size*(size/COLMP)+COLMP;
+	if(np>4){
+		for(i=4;i<np;i++){
+			offst[i]=size*(size/COLMP)+(COLMP*i);
+		}
+	}
+
 	if(rank==0){
 		for(i=0;i<np;i++){
 			MPI_Send(matriz_1+offst[i], 1, nsubmp, i, tag, MPI_COMM_WORLD);
@@ -189,13 +211,11 @@ int main(int argc, char **argv){
 	//Ahora, todos los procesos reciben las submatrices que le corresponden, en la matriz_2
 	MPI_Recv(subm_2, FILMP*COLMP, MPI_INT, 0, tag, MPI_COMM_WORLD, &sts);
 
-
 	//luego, todos se ponen a calcular, llamando a matmul(), y almacenando el resultado en subm_res
 	matmul(subm_1, subm_2, subm_res, FILMP, COLMP);
+
 	
 	MPI_Send(subm_res, FILMP*COLMP, MPI_INT, 0, tag, MPI_COMM_WORLD);			
-
-
 	//RECIBO DATOS:
 	if(rank==0){
 		for(i=0;i<FILMP;i++){
