@@ -1,4 +1,4 @@
 all: folders
-	mpicc tp8.c -Wall -o bin/tp7_8
+	mpicc tp8.c -Wall -o bin/tp8
 folders:
 	mkdir bin
