@@ -43,7 +43,7 @@ void AES_128_ecb_encrypt_file(FILE* in, FILE* out, const unsigned char* userkey)
 
 // TODO
 void AES_128_ecb_encrypt(const unsigned char* in, unsigned char* out, unsigned long long len, unsigned long long* olen, const unsigned char* userkey){
-	//parámetro in: viene con un buffer de len bytes, con bloques de 1 byte (porque un char tiene 8 bits=1 byte)
+	//parámetro in: viene con un buffer de len bytes, con bloques de 16 bytes
 	//parámetro out: sale con el in ya cifrado pero con padding agregado
 	//parámetro olen: el largo de out en bytes
 	//parámetro len: el largo de in en bytes
@@ -117,7 +117,7 @@ void AES_128_ecb_encrypt(const unsigned char* in, unsigned char* out, unsigned l
 
 
 void AES_128_ecb_encrypt_multiples(const unsigned char* in, unsigned char* out, unsigned long long len, unsigned long long* olen, const unsigned char* userkey){
-	//parámetro in: viene con un buffer de len bytes, con bloques de 1 byte (porque un char tiene 8 bits=1 byte)
+	//parámetro in: viene con un buffer de len bytes, con bloques de 16 bytes
 	//parámetro out: sale con el in ya cifrado pero con padding agregado
 	//parámetro olen: el largo de out en bytes
 	//parámetro len: el largo de in en bytes
@@ -165,7 +165,7 @@ void AES_128_ecb_encrypt_multiples(const unsigned char* in, unsigned char* out, 
 		}
 	}
 
-	//por otro lado, cifro el bloque len-BLOCK_SIZE
+	//por otro lado, cifro el bloque len-BLOCK_SIZE, o sea, el penúltimo
 	in_multiple_2=calloc(sizeof(unsigned char),BLOCK_SIZE);
 	out_multiple_2=calloc(sizeof(unsigned char),BLOCK_SIZE);
 
