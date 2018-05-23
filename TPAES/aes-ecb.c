@@ -1,6 +1,7 @@
 #include "aes-128.h"
 #include "aes-ecb.h"
 #include<stdlib.h>
+#include <omp.h>
 
 #ifndef EXIT_SUCCESS
 #define EXIT_SUCCESS 0
@@ -122,6 +123,10 @@ void AES_128_ecb_encrypt_multiples(const unsigned char* in, unsigned char* out, 
 	//parámetro olen: el largo de out en bytes
 	//parámetro len: el largo de in en bytes
 
+	if(len-BLOCK_SIZE<(4*BLOCK_SIZE)-BLOCK_SIZE){
+		printf("\nEsta función sirve para cifrar 4 bloques o más. Intente utilizar la versión secuencial.\n");	
+		exit(EXIT_FAILURE);
+	}
 	unsigned char inblock[BLOCK_SIZE];
 	unsigned char outblock[BLOCK_SIZE];
 
@@ -214,3 +219,57 @@ void AES_128_ecb_encrypt_multiples(const unsigned char* in, unsigned char* out, 
 	}
 }
 
+
+void AES_128_ecb_encrypt_openmp(const unsigned char* in, unsigned char* out, unsigned long long len, unsigned long long* olen, const unsigned char* userkey){
+	if(len<BLOCK_SIZE || len==BLOCK_SIZE){
+		printf("\nSi se quiere cifrar un solo bloque de 16 bytes, utilizar la versión secuencial.\n");	
+		exit(EXIT_FAILURE);
+	}	
+	unsigned char inblock[BLOCK_SIZE];
+	unsigned char outblock[BLOCK_SIZE];
+
+	unsigned char key[(ROUNDS+1)*BLOCK_SIZE];
+
+	unsigned long bytes_read=0;
+
+	unsigned int padding_value;
+	int i=0,j=0;
+
+	AES_128_set_key(userkey,key);
+
+	unsigned long length_padding = 0;
+	
+	olen[0]=len;
+		
+	length_padding = len-BLOCK_SIZE;
+
+	int canthilos=4; //cantidad por defecto de hilos para el programa
+	omp_set_num_threads(canthilos);
+
+	#pragma omp parallel for
+	for(i=0;i<len;i++){
+		for(j=0;j<BLOCK_SIZE;j++){
+			inblock[j]=in[i*BLOCK_SIZE+j];		
+		}
+
+		AES_128_encrypt(inblock,outblock,key);
+
+		for(j=0;j<BLOCK_SIZE;j++){
+			out[i*BLOCK_SIZE+j]=outblock[j];
+		}
+		bytes_read++;
+	}
+	
+	
+	padding_value = BLOCK_SIZE-bytes_read;
+	for (i=bytes_read; i < BLOCK_SIZE; i++){
+		inblock[i] = (unsigned char) padding_value;
+	}
+	AES_128_encrypt(inblock, outblock, key);
+
+	for(i=length_padding;i<olen[0];i++){
+		for(j=0;j<BLOCK_SIZE;j++){
+			out[i*BLOCK_SIZE+j]=outblock[j];
+		}
+	}
+}

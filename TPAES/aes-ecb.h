@@ -13,3 +13,5 @@ void AES_128_ecb_encrypt_file(FILE* in, FILE* out, const unsigned char* userkey)
 void AES_128_ecb_encrypt(const unsigned char* in, unsigned char* out, unsigned long long len, unsigned long long* olen, const unsigned char* key);
 
 void AES_128_ecb_encrypt_multiples(const unsigned char* in, unsigned char* out, unsigned long long len, unsigned long long* olen, const unsigned char* userkey);
+
+void AES_128_ecb_encrypt_openmp(const unsigned char* in, unsigned char* out, unsigned long long len, unsigned long long* olen, const unsigned char* userkey);

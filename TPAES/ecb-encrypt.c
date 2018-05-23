@@ -96,25 +96,26 @@ void create_buffer(unsigned char* c, size_t len){
 int
 main (int argc, char **argv)
 {
+
   unsigned char userkey[KEY_SIZE];
+
   int opt, keylen = 0;
   FILE* in = stdin;
   FILE* out = stdout;
   int bytes_input=0;
 
-  while ((opt = getopt (argc, argv, "bhtk:i:o")) != -1)
+  while ((opt = getopt (argc, argv, "htbk:i:o:")) != -1)
     {
+
       switch (opt)
 	{
-	case 'b':
-	   bytes_input=1;
-	   break;
 	case 'h':
 	  usage (argv[0]);
 	  exit(EXIT_SUCCESS);
 	case 't':
 	      do_tests ();
 	      break;
+
 	case 'k':
 	  keylen = str2bytes(optarg,userkey,KEY_SIZE);
 	  break;
@@ -133,9 +134,13 @@ main (int argc, char **argv)
 	  }
 	  break;
 
-	   
+	case 'b':
+	  bytes_input=1;
+	  keylen = str2bytes("b8490611de82c4f7b5ee3dca5e861867",userkey,KEY_SIZE);	
+          break;
+
 	default:		/* '?' */
-	  
+	
 	  usage (argv[0]);
 	  exit (EXIT_FAILURE);
 	}
@@ -147,8 +152,10 @@ main (int argc, char **argv)
 	  }
 	  
 	if(bytes_input!=0){
-          //int blocks=128; //2mb 
-	  int blocks=120;
+          //int blocks=128; //2mb=128*16
+	  //int blocks=120; //1,88mb=> 1mb--1024 bytes, 120*16bytes=1920 bytes--x => x=1,88mb
+
+	  int blocks=64; //pruebo con 1mb
      	  unsigned char* inblocks = calloc(sizeof(unsigned char),blocks*BLOCK_SIZE);
 	  create_buffer(inblocks, blocks*BLOCK_SIZE);
           unsigned char* outblocks = calloc(sizeof(unsigned char),blocks*BLOCK_SIZE);
@@ -157,9 +164,13 @@ main (int argc, char **argv)
 
 	  double stop=0;
 	  double stop_2=0;
+	  double stop_3=0;
           double veloc_sec=0;
           double veloc_mult=0;
 
+	  bytes_input=blocks*BLOCK_SIZE;
+
+	  /*
 	  clock_t start= clock();
 	  AES_128_ecb_encrypt(inblocks,outblocks, length_inb, &length_outb, userkey);
 	  stop=((double)clock() - start) / CLOCKS_PER_SEC;
@@ -168,20 +179,25 @@ main (int argc, char **argv)
           AES_128_ecb_encrypt_multiples(inblocks,outblocks, length_inb, &length_outb, userkey);
 	  stop_2=((double)clock() - start_2) / CLOCKS_PER_SEC;
 
-          stop=((double)clock() - start) / CLOCKS_PER_SEC;
-
-	  bytes_input=blocks*BLOCK_SIZE;
+	  */
+	 
+	  clock_t start_3=clock();
+	  AES_128_ecb_encrypt_openmp(inblocks,outblocks, length_inb, &length_outb, userkey);
+	  stop_3=((double)clock() - start_3) / CLOCKS_PER_SEC;
           
-	  printf("Cifrados %d bytes en %lf seg., utilizando cifrado secuencial\n", bytes_input ,stop);
-	  printf("Cifrados %d bytes en %lf seg., utilizando cifrado paralelo\n", bytes_input ,stop_2);
+	  //printf("Cifrados %d bytes en %lf seg., utilizando cifrado secuencial\n", bytes_input ,stop);
+	  //printf("Cifrados %d bytes en %lf seg., utilizando cifrado paralelo a nivel de instrucciones\n", bytes_input ,stop_2);
+	  printf("Cifrados %d bytes en %lf seg., utilizando cifrado paralelo con OpenMP\n", bytes_input, stop_3);
 
 //64 bloques de 16 bytes cada uno=1024 bytes, 1mb. Si 1mb tarda 0.000088 (aprox), bytes_input, x, asi saco la velocidad sec
- 	  veloc_sec=bytes_input*0.000088/1;
+ 	  //veloc_sec=bytes_input*0.000088/1;
 //64 bloques de 16 bytes cada uno=1024 bytes, 1mb. Si 1mb tarda 0.000025 (aprox), bytes_input, x, asi saco la velocidad pero a nivel de instrucc
- 	  veloc_mult=bytes_input*0.000025/1; 
+ 	  //veloc_mult=bytes_input*0.000025/1; 
+	  //veloc_mult=bytes_input*0.000025/1; 
 
-          printf("Velocidad del cifrado secuencial: %lf MB/seg.\n", veloc_sec);
-          printf("Velocidad del cifrado paralelo (a nivel de instrucciones): %lf MB/seg.\n", veloc_mult);
+          //printf("Velocidad del cifrado secuencial: %lf MB/seg.\n", veloc_sec);
+          //printf("Velocidad del cifrado paralelo a nivel de instrucciones: %lf MB/seg.\n", veloc_mult);
+	  
 	  
 	  //AES_128_ecb_encrypt_file(in,out,userkey);
           //fseek(in, 0L, SEEK_END);
