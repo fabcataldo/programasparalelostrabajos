@@ -243,7 +243,7 @@ void AES_128_ecb_encrypt_openmp(const unsigned char* in, unsigned char* out, uns
 		
 	length_padding = len-BLOCK_SIZE;
 
-	int canthilos=4; //cantidad por defecto de hilos para el programa
+	int canthilos=4;
 	omp_set_num_threads(canthilos);
 
 	#pragma omp parallel for

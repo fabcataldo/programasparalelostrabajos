@@ -104,9 +104,8 @@ main (int argc, char **argv)
   FILE* out = stdout;
   int bytes_input=0;
 
-  while ((opt = getopt (argc, argv, "htbk:i:o:")) != -1)
+  while ((opt = getopt (argc, argv, "bhtk:i:o:")) != -1)
     {
-
       switch (opt)
 	{
 	case 'h':
@@ -155,7 +154,7 @@ main (int argc, char **argv)
           //int blocks=128; //2mb=128*16
 	  //int blocks=120; //1,88mb=> 1mb--1024 bytes, 120*16bytes=1920 bytes--x => x=1,88mb
 
-	  int blocks=64; //pruebo con 1mb
+	  int blocks=64; //pruebo con 1mb, para sacar luego, la velocidad, con openmp
      	  unsigned char* inblocks = calloc(sizeof(unsigned char),blocks*BLOCK_SIZE);
 	  create_buffer(inblocks, blocks*BLOCK_SIZE);
           unsigned char* outblocks = calloc(sizeof(unsigned char),blocks*BLOCK_SIZE);

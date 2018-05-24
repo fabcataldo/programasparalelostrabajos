@@ -10,7 +10,7 @@ bin/ecb-encrypt-aesni: ecb-encrypt.c aesni-128.c util.c aes-ecb.c | bin
 	$(CC) -fopenmp -maes $(CFLAGS) $(OFLAGS) $^ -o $@
 
 bin/test-ecb-encrypt: test-ecb-encrypt.c aesni-128.c aes-ecb.c | bin
-	$(CC) -maes $(CFLAGS) $(OFLAGS) $^ $(GLIB_FLAGS) -o $@
+	$(CC) -fopenmp -maes $(CFLAGS) $(OFLAGS) $^ $(GLIB_FLAGS) -o $@
 
 bin:
 	mkdir -p bin
