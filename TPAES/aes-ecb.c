@@ -95,7 +95,7 @@ void AES_128_ecb_encrypt(const unsigned char* in, unsigned char* out, unsigned l
 }
 
 
-void AES_128_ecb_encrypt_ni(const unsigned char* in, unsigned char* out, unsigned long long len, unsigned long long* olen, const unsigned char* userkey){
+void AES_128_ecb_encrypt_niv(const unsigned char* in, unsigned char* out, unsigned long long len, unsigned long long* olen, const unsigned char* userkey){
 //UNDER CONSTRUCTION---------------------------------------------------------====================================================
 	unsigned char inblock[BLOCK_SIZE];
 	unsigned char outblock[BLOCK_SIZE];
