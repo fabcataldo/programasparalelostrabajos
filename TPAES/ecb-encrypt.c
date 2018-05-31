@@ -92,66 +92,8 @@ void create_buffer(unsigned char* c, size_t len){
         c[i] = lrand48();
 }
 
-
-int
-main (int argc, char **argv)
-{
-
-  unsigned char userkey[KEY_SIZE];
-
-  int opt, keylen = 0;
-  FILE* in = stdin;
-  FILE* out = stdout;
-  int bytes_input=0;
-
-  while ((opt = getopt (argc, argv, "bhtk:i:o:")) != -1)
-    {
-      switch (opt)
-	{
-	case 'h':
-	  usage (argv[0]);
-	  exit(EXIT_SUCCESS);
-	case 't':
-	      do_tests ();
-	      break;
-
-	case 'k':
-	  keylen = str2bytes(optarg,userkey,KEY_SIZE);
-	  break;
-	case 'i':
-	  in = fopen(optarg,"rb");
-	  if (in == NULL) {
-	    fprintf(stderr,"'%s': %s\n",optarg, strerror(errno));
-	    exit(EXIT_FAILURE);
-	  }
-	  break;
-	case 'o':
-	  out = fopen(optarg,"wb");
-	  if (out == NULL) {
-	    fprintf(stderr,"'%s': %s\n",optarg, strerror(errno));
-	    exit(EXIT_FAILURE);
-	  }
-	  break;
-
-	case 'b':
-	  bytes_input=1;
-	  keylen = str2bytes("b8490611de82c4f7b5ee3dca5e861867",userkey,KEY_SIZE);	
-          break;
-
-	default:		/* '?' */
-	
-	  usage (argv[0]);
-	  exit (EXIT_FAILURE);
-	}
-    }
-    	  if (keylen != KEY_SIZE){
-	    fprintf(stderr,"Debe especificarse una clave con 32 dígitos hexadecimales\n");
-	    usage(argv[0]);
-	    exit(EXIT_FAILURE);
-	  }
-	  
-	if(bytes_input!=0){
-          //int blocks=128; //2mb=128*16
+void benchmark_opt (unsigned char* userkey) {
+	   //int blocks=128; //2mb=128*16
 	  //int blocks=120; //1,88mb=> 1mb--1024 bytes, 120*16bytes=1920 bytes--x => x=1,88mb
 
 	  int blocks=64; //pruebo con 1mb, para sacar luego, la velocidad, con openmp
@@ -167,7 +109,7 @@ main (int argc, char **argv)
           double veloc_sec=0;
           double veloc_mult=0;
 
-	  bytes_input=blocks*BLOCK_SIZE;
+	  int bytes_input=blocks*BLOCK_SIZE;
 
 	  /*
 	  clock_t start= clock();
@@ -196,8 +138,72 @@ main (int argc, char **argv)
 
           //printf("Velocidad del cifrado secuencial: %lf MB/seg.\n", veloc_sec);
           //printf("Velocidad del cifrado paralelo a nivel de instrucciones: %lf MB/seg.\n", veloc_mult);
+}
+
+
+
+int
+main (int argc, char **argv)
+{
+
+  unsigned char userkey[KEY_SIZE];
+
+  int opt, keylen = 0;
+  FILE* in = stdin;
+  FILE* out = stdout;
+  int benchmark=0;
+
+  while ((opt = getopt (argc, argv, "hbtk:i:o:")) != -1)
+    {
+      switch (opt)
+	{
+	case 'h':
+	  usage (argv[0]);
+	  exit(EXIT_SUCCESS);
+
+	case 'b':
+	  benchmark=1;
+	  keylen = str2bytes("b8490611de82c4f7b5ee3dca5e861867",userkey,KEY_SIZE);	
+          break;
+
+	case 't':
+	      do_tests ();
+	      break;
+
+	case 'k':
+	  keylen = str2bytes(optarg,userkey,KEY_SIZE);
+	  break;
+	case 'i':
+	  in = fopen(optarg,"rb");
+	  if (in == NULL) {
+	    fprintf(stderr,"'%s': %s\n",optarg, strerror(errno));
+	    exit(EXIT_FAILURE);
+	  }
+	  break;
+	case 'o':
+	  out = fopen(optarg,"wb");
+	  if (out == NULL) {
+	    fprintf(stderr,"'%s': %s\n",optarg, strerror(errno));
+	    exit(EXIT_FAILURE);
+	  }
+	  break;
+
+	default:		/* '?' */
+	
+	  usage (argv[0]);
+	  exit (EXIT_FAILURE);
+	}
+    }
+    	  if (keylen != KEY_SIZE){
+	    fprintf(stderr,"Debe especificarse una clave con 32 dígitos hexadecimales\n");
+	    usage(argv[0]);
+	    exit(EXIT_FAILURE);
+	  }
 	  
-	  
+	if(benchmark!=0){
+	  printf("ads\n");
+	  benchmark_opt(userkey);
+
 	  //AES_128_ecb_encrypt_file(in,out,userkey);
           //fseek(in, 0L, SEEK_END);
 	  //bytes_input=ftell(in);

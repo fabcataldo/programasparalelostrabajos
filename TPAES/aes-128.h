@@ -20,6 +20,7 @@ void AES_128_set_key(const unsigned char *userkey, unsigned char *key);
 void AES_128_encrypt(const unsigned char* in, unsigned char* out, const unsigned char* subkeys);
 
 void AES_128_encrypt_2(const unsigned char* in, unsigned char* out, const unsigned char* subkeys);
+void AES_128_encrypt_4(const unsigned char* in, unsigned char* out, const unsigned char* subkeys);
 void AES_128_encrypt_8(const unsigned char* in, unsigned char* out, const unsigned char* subkeys);
 #endif
 

@@ -81,6 +81,35 @@ void AES_128_encrypt_2(const unsigned char* in, unsigned char* out, const unsign
   _mm_storeu_si128((__m128i*) (out+BLOCK_SIZE), out_2);
 }
 
+void AES_128_encrypt_4(const unsigned char* in, unsigned char* out, const unsigned char* subkeys){
+  int i;
+  __m128i subkey = _mm_loadu_si128((__m128i*) subkeys); 
+  __m128i out_1 = _mm_xor_si128(_mm_loadu_si128((__m128i*)in),subkey);
+  __m128i out_2 = _mm_xor_si128(_mm_loadu_si128((__m128i*)(in+BLOCK_SIZE)),subkey);
+
+  __m128i out_3 = _mm_xor_si128(_mm_loadu_si128((__m128i*)(in+(BLOCK_SIZE*2))),subkey);
+  __m128i out_4 = _mm_xor_si128(_mm_loadu_si128((__m128i*)(in+(BLOCK_SIZE*3))),subkey);
+  for (i = 1; i < ROUNDS; i++){
+    subkey = _mm_loadu_si128((__m128i*)(subkeys+(i*BLOCK_SIZE)));
+    out_1 = _mm_aesenc_si128(out_1,subkey);
+    out_2 = _mm_aesenc_si128(out_2,subkey);
+
+    out_3 = _mm_aesenc_si128(out_3,subkey);
+    out_4 = _mm_aesenc_si128(out_4,subkey);
+  }
+  subkey = _mm_loadu_si128((__m128i*)(subkeys+(ROUNDS*BLOCK_SIZE)));
+  out_1 = _mm_aesenclast_si128(out_1, subkey);
+  out_2 = _mm_aesenclast_si128(out_2, subkey);
+
+  out_3 = _mm_aesenclast_si128(out_3, subkey);
+  out_4 = _mm_aesenclast_si128(out_4, subkey);
+
+  _mm_storeu_si128((__m128i*) out, out_1);
+  _mm_storeu_si128((__m128i*) (out+BLOCK_SIZE), out_2);
+  _mm_storeu_si128((__m128i*) (out+(BLOCK_SIZE*2)), out_3);
+  _mm_storeu_si128((__m128i*) (out+(BLOCK_SIZE*3)), out_4);
+}
+
 void AES_128_encrypt_8(const unsigned char* in, unsigned char* out, const unsigned char* subkeys){
   int i;
   __m128i subkey = _mm_loadu_si128((__m128i*) subkeys); 
@@ -104,7 +133,6 @@ void AES_128_encrypt_8(const unsigned char* in, unsigned char* out, const unsign
     out_6 = _mm_aesenc_si128(out_6,subkey);
     out_7 = _mm_aesenc_si128(out_7,subkey);
     out_8 = _mm_aesenc_si128(out_8,subkey);
-
   }
   subkey = _mm_loadu_si128((__m128i*)(subkeys+(ROUNDS*BLOCK_SIZE)));
   out_1 = _mm_aesenclast_si128(out_1, subkey);
