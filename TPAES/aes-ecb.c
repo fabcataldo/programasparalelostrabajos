@@ -62,9 +62,14 @@ void AES_128_ecb_encrypt(const unsigned char* in, unsigned char* out, unsigned l
 
 	int i;
 	unsigned int filled_padd = len%BLOCK_SIZE; //lo que ya llené del último bloque de 16 bytes
+
 	//PADDING es lo que me falta para rellenar el último bloque que tiene que ser de 16 bytes
 	unsigned int padding_value = BLOCK_SIZE-filled_padd;
+
+	//complete_blocks se refiere a los bloques que son múltiplos de 16
 	unsigned int complete_blocks = len-filled_padd;
+
+	//complete_len sería los bloques que son múltiplos de 16 más el bloque que se agrega al último, en la salida, que es de 16
 	unsigned int complete_len = complete_blocks+BLOCK_SIZE;
 	
 	//encripto los primeros bloques múltiplos de 16
@@ -77,7 +82,6 @@ void AES_128_ecb_encrypt(const unsigned char* in, unsigned char* out, unsigned l
 	}
 
 	//ahora encripto los bytes que faltan con padding_value
-	// bytes_read != BLOCK_SIZE
 	//Es el último bloque, posiblemente vacío.
 	//Se aplica padding, colocando en cada byte de padding la longitud del mismo
 	for (i=filled_padd; i < BLOCK_SIZE; i++){
