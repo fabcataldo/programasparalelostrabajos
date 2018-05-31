@@ -90,9 +90,13 @@ void AES_128_ecb_encrypt(const unsigned char* in, unsigned char* out, unsigned l
 	// Ciframos el bloque con padding
 	AES_128_encrypt(inblock, outblock, key);
 
+	//tomo outblock, y le paso al out los bytes que faltan ya cifrados, y empiezo desde j=filled_padd
+	int j=filled_padd;
+
 	//le paso el bloque con padding ya cifrado al out
 	for(i = complete_blocks+filled_padd; i < complete_len; i++){
-		out[i] = outblock[i];
+		out[i] = outblock[j];
+		j++;
 	}
 	
 	*olen=complete_len;
@@ -172,6 +176,7 @@ void AES_128_ecb_encrypt_openmp(const unsigned char* in, unsigned char* out, uns
 	unsigned int complete_blocks = len-filled_padd;
 	unsigned int complete_len = complete_blocks+BLOCK_SIZE;
 
+	omp_set_num_threads(4);	
 	#pragma omp parallel for
 	for(i=0; i<complete_blocks; i+=BLOCK_SIZE){
 		AES_128_encrypt(in+i, out+i, key);
