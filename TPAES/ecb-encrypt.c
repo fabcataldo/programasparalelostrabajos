@@ -94,10 +94,8 @@ void update_buffer(unsigned char* c, size_t len){
 }
 
 void benchmark_opt (unsigned char* userkey) {
-	//int blocks=128; //2mb=128*16
-	int blocks=120; //1,88mb=> 1mb--1024 bytes, 120*16bytes=1920 bytes--x => x=1,88mb
-
-	//int blocks=64; //pruebo con 1mb, para sacar luego, la velocidad, con openmp
+	//1MB son 1024KB o 1048576 bytes
+	int blocks=65536; //pruebo con 1mb, para sacar luego, la velocidad
 	unsigned char* inblocks = calloc(sizeof(unsigned char),blocks*BLOCK_SIZE);
 	//update_buffer(inblocks, blocks*BLOCK_SIZE);
 	unsigned char* outblocks = calloc(sizeof(unsigned char),(blocks*BLOCK_SIZE) + BLOCK_SIZE);
@@ -118,7 +116,7 @@ void benchmark_opt (unsigned char* userkey) {
 	stop=((double)clock() - start) / CLOCKS_PER_SEC;
 
 	update_buffer(inblocks, blocks*BLOCK_SIZE);
-          
+     
 	clock_t start_2= clock();
 	AES_128_ecb_encrypt_niv(inblocks,outblocks, length_inb, &length_outb, userkey);
 	stop_2=((double)clock() - start_2) / CLOCKS_PER_SEC;
@@ -131,14 +129,14 @@ void benchmark_opt (unsigned char* userkey) {
 
 	printf("Cifrados %d bytes en %lf seg., utilizando cifrado secuencial\n", bytes_input ,stop);
 	printf("Cifrados %d bytes en %lf seg., utilizando cifrado paralelo a nivel de instrucciones\n", bytes_input ,stop_2);
-	printf("Cifrados %d bytes en %lf seg., utilizando cifrado paralelo con OpenMP\n", bytes_input, stop_3);
+	printf("Cifrados %d bytes en %lf seg., utilizando cifrado paralelo con OpenMP\n\n", bytes_input, stop_3);
 
-//Si 1mb tarda 0.000012 seg.(aprox), bytes_input, x, asi saco veloc_sec
-	veloc_sec=bytes_input*0.000012/1;
-//Si 1mb. Si 1mb tarda 0.000010 (aprox), bytes_input, x, asi saco veloc_niv
-	veloc_niv=bytes_input*0.000010/1; 
-//si con 1mb la versión con openmp tarda 0.007366 seg. (aprox), bytes_input---->x
-	veloc_omp=bytes_input*0.007366/1; 
+//Si 1MB (o 1048576 bytes) tarda 0,00278 seg.(en promedio, aprox), bytes_input, x, asi saco veloc_sec
+	veloc_sec=bytes_input*0.00278/1048576;
+//Si 1MB (o 1048576 bytes) tarda 0.0000095 seg.(en promedio, aprox), bytes_input, x, asi saco veloc_niv
+	veloc_niv=bytes_input*0.0000095/1048576; 
+//Si 1MB (o 1048576 bytes) tarda 0,006884 seg.(en promedio, aprox), bytes_input, x, asi saco veloc_omp
+	veloc_omp=bytes_input*0.006884/1048576; 
 
 	printf("Velocidad del cifrado secuencial: %lf MB/seg.\n", veloc_sec);
 	printf("Velocidad del cifrado paralelo a nivel de instrucciones: %lf MB/seg.\n", veloc_niv);

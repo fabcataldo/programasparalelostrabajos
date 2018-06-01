@@ -46,6 +46,7 @@ void read_buff(const unsigned char* a, int size){
 	}
 }
 
+
 // TODO
 void AES_128_ecb_encrypt(const unsigned char* in, unsigned char* out, unsigned long long len, unsigned long long* olen, const unsigned char* userkey){
 	//parámetro in: viene con un buffer de len bytes, con bloques de 16 bytes
@@ -66,39 +67,40 @@ void AES_128_ecb_encrypt(const unsigned char* in, unsigned char* out, unsigned l
 	//PADDING es lo que me falta para rellenar el último bloque que tiene que ser de 16 bytes
 	unsigned int padding_value = BLOCK_SIZE-filled_padd;
 
-	//complete_blocks se refiere a los bloques que son múltiplos de 16
-	unsigned int complete_blocks = len-filled_padd;
-
-	//complete_len sería los bloques que son múltiplos de 16 más el bloque que se agrega al último, en la salida, que es de 16
-	unsigned int complete_len = complete_blocks+BLOCK_SIZE;
+	//complete_blocks se refiere a los bloques que son múltiplos de 16, bloques completos
+	//¿cuántos bloques entran en 16 bytes? con esto saco los bloques que están completos
+	unsigned int complete_blocks = len/BLOCK_SIZE;
 	
 	//encripto los primeros bloques múltiplos de 16
-	for(i=0; i<complete_blocks; i+=BLOCK_SIZE){
-		AES_128_encrypt(in+i, out+i, key);
-	}
-	//si me ha quedado un pedacito del último bloque sin encriptar, lo encripto
-	for(i = complete_blocks; i<len; i++){
-		AES_128_encrypt(in+i, out+i, key);
+	//corro los punteros in y out para que lleguen hasta después del último bloque completo
+	for(i=0; i<complete_blocks; i++){
+		AES_128_encrypt(in, out, key);
+		in+=BLOCK_SIZE;
+		out+=BLOCK_SIZE;
 	}
 
 	//ahora encripto los bytes que faltan con padding_value
 	//Es el último bloque, posiblemente vacío.
 	//Se aplica padding, colocando en cada byte de padding la longitud del mismo
+	//ahora como in está después del último bloque completo, si quedó algo sin cifrar antes (bloque incompleto) lo paso a inblocks para luego
+	//agregarle el padding y cifrar
+	for(i=0; i<filled_padd; i++){
+		inblock[i]=in[i];
+	}
 	for (i=filled_padd; i < BLOCK_SIZE; i++){
 		inblock[i] = (unsigned char) padding_value;
 	}
 	// Ciframos el bloque con padding
 	AES_128_encrypt(inblock, outblock, key);
 
-	//tomo outblock, y le paso al out los bytes que faltan ya cifrados, y empiezo desde j=filled_padd
-	int j=filled_padd;
-
 	//le paso el bloque con padding ya cifrado al out
-	for(i = complete_blocks+filled_padd; i < complete_len; i++){
-		out[i] = outblock[j];
-		j++;
+	//como out ya está apuntando a después del último bloque completo, le paso outblock conseguido antes
+	for(i = 0; i < BLOCK_SIZE; i++){
+		out[i] = outblock[i];
 	}
-	
+
+	//complete_len sería los bloques que son múltiplos de 16 más el relleno
+	unsigned int complete_len = len+padding_value;
 	*olen=complete_len;
 }
 
@@ -112,45 +114,47 @@ void AES_128_ecb_encrypt_niv(const unsigned char* in, unsigned char* out, unsign
 	AES_128_set_key(userkey,key);
 
 	int i;
-	unsigned int filled_padd = len%BLOCK_SIZE; 
+	unsigned int filled_padd = len%BLOCK_SIZE;
 	unsigned int padding_value = BLOCK_SIZE-filled_padd;
-	unsigned int complete_blocks = len-filled_padd;
-	unsigned int complete_len = complete_blocks+BLOCK_SIZE;
+	unsigned int complete_blocks = len/BLOCK_SIZE;
 
-	if(complete_blocks<=BLOCK_SIZE || complete_blocks <= 2*BLOCK_SIZE){
-		printf("\nSi se quiere encriptar un solo bloque, o un bloque de tamaño menor a 32 bytes, utilice la versión secuencial.");	
+	if(complete_blocks==1){
+		printf("\nSi se quiere encriptar un solo bloque (o un bloque y un 'pedacito'), utilice la versión secuencial.");	
 		exit(EXIT_FAILURE);
 	}
-	else{
-		if(complete_blocks>=(2*BLOCK_SIZE) || complete_blocks<(4*BLOCK_SIZE)) {
-				AES_128_encrypt_2(in,out,key);
-		}
-		else{
-			if(complete_blocks>=(4*BLOCK_SIZE) || complete_blocks<(8*BLOCK_SIZE)){
-				AES_128_encrypt_4(in,out,key);	
-			}	
-			else{
-				if(complete_blocks>=(8*BLOCK_SIZE)){
-					AES_128_encrypt_8(in,out,key);	
-				}				
-			}
-		}
+	if(complete_blocks>=2 || complete_blocks <4){
+			AES_128_encrypt_2(in,out,key);
+	}
+	if(complete_blocks>=4  || complete_blocks<8){
+		AES_128_encrypt_4(in,out,key);	
+	}	
+	if(complete_blocks>=8  || complete_blocks >8){
+			AES_128_encrypt_8(in,out,key);	
 	}
 	
-	for(i = complete_blocks; i<len; i++){
-		AES_128_encrypt(in+i, out+i, key);
+	if(complete_blocks!=2 && complete_blocks!=4 && complete_blocks!=8){
+			in+=(complete_blocks-1)*BLOCK_SIZE;
+			out+=(complete_blocks-1)*BLOCK_SIZE;
+			AES_128_encrypt(in,out,key);
+			in+=BLOCK_SIZE;
+			out+=BLOCK_SIZE;
 	}
 
-
+	for(i=0; i<filled_padd; i++){
+		inblock[i]=in[i];
+	}
 	for (i=filled_padd; i < BLOCK_SIZE; i++){
 		inblock[i] = (unsigned char) padding_value;
 	}
 	AES_128_encrypt(inblock, outblock, key);
-	for(i = complete_blocks+filled_padd; i < complete_len; i++){
+
+	for(i = 0; i < BLOCK_SIZE; i++){
 		out[i] = outblock[i];
 	}
-	
+
+	unsigned int complete_len = len+padding_value;
 	*olen=complete_len;
+
 //UNDER CONSTRUCTION---------------------------------------------------------====================================================
 }
 
@@ -166,34 +170,34 @@ void AES_128_ecb_encrypt_openmp(const unsigned char* in, unsigned char* out, uns
 	unsigned char outblock[BLOCK_SIZE];
 
 	unsigned char key[(ROUNDS+1)*BLOCK_SIZE];
-
 	AES_128_set_key(userkey,key);
 
 	int i;
-	unsigned int filled_padd = len%BLOCK_SIZE; 
-
+	unsigned int filled_padd = len%BLOCK_SIZE;
 	unsigned int padding_value = BLOCK_SIZE-filled_padd;
-	unsigned int complete_blocks = len-filled_padd;
-	unsigned int complete_len = complete_blocks+BLOCK_SIZE;
-
+	unsigned int complete_blocks = len/BLOCK_SIZE;
+	
 	omp_set_num_threads(4);	
 	#pragma omp parallel for
-	for(i=0; i<complete_blocks; i+=BLOCK_SIZE){
-		AES_128_encrypt(in+i, out+i, key);
+	for(i=0; i<complete_blocks; i++){
+		AES_128_encrypt(in, out, key);
+		in+=BLOCK_SIZE;
+		out+=BLOCK_SIZE;
 	}
 
-	for(i = complete_blocks; i<len; i++){
-		AES_128_encrypt(in+i, out+i, key);
+	for(i=0; i<filled_padd; i++){
+		inblock[i]=in[i];
 	}
-
 	for (i=filled_padd; i < BLOCK_SIZE; i++){
 		inblock[i] = (unsigned char) padding_value;
 	}
 	AES_128_encrypt(inblock, outblock, key);
-	for(i = complete_blocks+filled_padd; i < complete_len; i++){
+
+	for(i = 0; i < BLOCK_SIZE; i++){
 		out[i] = outblock[i];
 	}
-	
+
+	unsigned int complete_len = len+padding_value;
 	*olen=complete_len;
 //UNDER CONSTRUCTION---------------------------------------------------------====================================================
 }
