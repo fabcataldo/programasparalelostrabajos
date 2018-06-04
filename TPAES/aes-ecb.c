@@ -106,7 +106,6 @@ void AES_128_ecb_encrypt(const unsigned char* in, unsigned char* out, unsigned l
 
 
 void AES_128_ecb_encrypt_niv(const unsigned char* in, unsigned char* out, unsigned long long len, unsigned long long* olen, const unsigned char* userkey){
-//UNDER CONSTRUCTION---------------------------------------------------------====================================================
 	unsigned char inblock[BLOCK_SIZE];
 	unsigned char outblock[BLOCK_SIZE];
 
@@ -119,7 +118,7 @@ void AES_128_ecb_encrypt_niv(const unsigned char* in, unsigned char* out, unsign
 	unsigned int complete_blocks = len/BLOCK_SIZE;
 
 	if(complete_blocks==1){
-		printf("\nSi se quiere encriptar un solo bloque (o un bloque y un 'pedacito'), utilice la versión secuencial.");	
+		printf("\nSi se quiere encriptar un solo bloque, utilice la versión secuencial.");	
 		exit(EXIT_FAILURE);
 	}
 	if(complete_blocks>=2 || complete_blocks <4){
@@ -129,15 +128,12 @@ void AES_128_ecb_encrypt_niv(const unsigned char* in, unsigned char* out, unsign
 		AES_128_encrypt_4(in,out,key);	
 	}	
 	if(complete_blocks>=8  || complete_blocks >8){
-			AES_128_encrypt_8(in,out,key);	
-	}
-	
-	if(complete_blocks!=2 && complete_blocks!=4 && complete_blocks!=8){
-			in+=(complete_blocks-1)*BLOCK_SIZE;
-			out+=(complete_blocks-1)*BLOCK_SIZE;
-			AES_128_encrypt(in,out,key);
-			in+=BLOCK_SIZE;
-			out+=BLOCK_SIZE;
+			//ya me tocan 8 bloques o más
+			for(i=0;i<complete_blocks;i+=8){
+				AES_128_encrypt_8(in,out,key);	
+				in+=8*BLOCK_SIZE;
+				out+=8*BLOCK_SIZE;
+			}
 	}
 
 	for(i=0; i<filled_padd; i++){
@@ -154,13 +150,10 @@ void AES_128_ecb_encrypt_niv(const unsigned char* in, unsigned char* out, unsign
 
 	unsigned int complete_len = len+padding_value;
 	*olen=complete_len;
-
-//UNDER CONSTRUCTION---------------------------------------------------------====================================================
 }
 
 
 void AES_128_ecb_encrypt_openmp(const unsigned char* in, unsigned char* out, unsigned long long len, unsigned long long* olen, const unsigned char* userkey){
-//UNDER CONSTRUCTION---------------------------------------------------------====================================================
 	if(len<BLOCK_SIZE || len==BLOCK_SIZE){
 		printf("\nSi se quiere cifrar un solo bloque de 16 bytes, utilizar la versión secuencial.\n");	
 		exit(EXIT_FAILURE);
@@ -199,5 +192,4 @@ void AES_128_ecb_encrypt_openmp(const unsigned char* in, unsigned char* out, uns
 
 	unsigned int complete_len = len+padding_value;
 	*olen=complete_len;
-//UNDER CONSTRUCTION---------------------------------------------------------====================================================
 }

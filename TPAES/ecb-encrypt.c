@@ -95,7 +95,8 @@ void update_buffer(unsigned char* c, size_t len){
 
 void benchmark_opt (unsigned char* userkey) {
 	//1MB son 1024KB o 1048576 bytes
-	int blocks=65536; //pruebo con 1mb, para sacar luego, la velocidad
+	//int blocks=65536; //pruebo con 1mb, para sacar luego, la velocidad
+	int blocks=131072; //2mb en total, o sea, 131072*BLOCK_SIZE
 	unsigned char* inblocks = calloc(sizeof(unsigned char),blocks*BLOCK_SIZE);
 	//update_buffer(inblocks, blocks*BLOCK_SIZE);
 	unsigned char* outblocks = calloc(sizeof(unsigned char),(blocks*BLOCK_SIZE) + BLOCK_SIZE);
@@ -134,7 +135,7 @@ void benchmark_opt (unsigned char* userkey) {
 //Si 1MB (o 1048576 bytes) tarda 0,00278 seg.(en promedio, aprox), bytes_input, x, asi saco veloc_sec
 	veloc_sec=bytes_input*0.00278/1048576;
 //Si 1MB (o 1048576 bytes) tarda 0.0000095 seg.(en promedio, aprox), bytes_input, x, asi saco veloc_niv
-	veloc_niv=bytes_input*0.0000095/1048576; 
+	veloc_niv=bytes_input*0.000611/1048576; 
 //Si 1MB (o 1048576 bytes) tarda 0,006884 seg.(en promedio, aprox), bytes_input, x, asi saco veloc_omp
 	veloc_omp=bytes_input*0.006884/1048576; 
 
@@ -206,7 +207,6 @@ main (int argc, char **argv)
 	  }
 	  
 	if(benchmark!=0){
-	  printf("ads\n");
 	  benchmark_opt(userkey);
 
 	  //AES_128_ecb_encrypt_file(in,out,userkey);
