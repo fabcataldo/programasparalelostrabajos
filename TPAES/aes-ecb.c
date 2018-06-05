@@ -123,9 +123,13 @@ void AES_128_ecb_encrypt_niv(const unsigned char* in, unsigned char* out, unsign
 	}
 	if(complete_blocks>=2 || complete_blocks <4){
 			AES_128_encrypt_2(in,out,key);
+			in+=2*BLOCK_SIZE;
+			out+=2*BLOCK_SIZE;
 	}
 	if(complete_blocks>=4  || complete_blocks<8){
 		AES_128_encrypt_4(in,out,key);	
+		in+=4*BLOCK_SIZE;
+		out+=4*BLOCK_SIZE;
 	}	
 	if(complete_blocks>=8  || complete_blocks >8){
 			//ya me tocan 8 bloques o más

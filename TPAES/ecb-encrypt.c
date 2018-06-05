@@ -134,8 +134,8 @@ void benchmark_opt (unsigned char* userkey) {
 
 //Si 1MB (o 1048576 bytes) tarda 0,00278 seg.(en promedio, aprox), bytes_input, x, asi saco veloc_sec
 	veloc_sec=bytes_input*0.00278/1048576;
-//Si 1MB (o 1048576 bytes) tarda 0.0000095 seg.(en promedio, aprox), bytes_input, x, asi saco veloc_niv
-	veloc_niv=bytes_input*0.000611/1048576; 
+//Si 1MB (o 1048576 bytes) tarda 0,0005425 seg.(en promedio, aprox), bytes_input, x, asi saco veloc_niv
+	veloc_niv=bytes_input*0.0005425/1048576; 
 //Si 1MB (o 1048576 bytes) tarda 0,006884 seg.(en promedio, aprox), bytes_input, x, asi saco veloc_omp
 	veloc_omp=bytes_input*0.006884/1048576; 
 
