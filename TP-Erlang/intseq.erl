@@ -27,7 +27,7 @@ compute_interval (A, B, fa, fb, area) ->
                                 right_area = (fm+fb)*(b-m)/2,
 
                                 if
-                                   abs( area- (left_area+ right_area)) < pow(1.0,exp(-9) )  ->   ci = left_area+right_area;
+                                   abs( area- (left_area+ right_area)) < math:pow(1.0,exp(-9) )  ->   ci = left_area+right_area;
                                                                                                                                          ci;
 
                                 true ->
