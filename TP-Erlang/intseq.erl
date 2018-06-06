@@ -2,7 +2,7 @@
 -export([integral/2, compute_interval/5]).
 
 %% función x^2 para PROBAR
-f(x) -> math:pow(x, 2).
+f(X) -> math:pow(X, 2).
 
 %%---------------------------------------------------------
 %% Función: integral/3
@@ -14,25 +14,25 @@ f(x) -> math:pow(x, 2).
 %%---------------------------------------------------------
 
 integral (A,B) ->
-                                fa = f(A),
-                                fb = f(B),
-                                area = (fa+fb)*(B-A)/2,
-                                integral = compute_interval(A,B,fa,fb,area),
-                                io:format("Integral de x^2: ~p~n",[integral]).
+                                Fa = f(A),
+                                Fb = f(B),
+                                Area = (Fa+Fb)*(B-A)/2,
+                                Integral = compute_interval(A,B,Fa,Fb,Area),
+                                io:format("Integral de x^2: ~p~n",[Integral]).
 
-compute_interval (A, B, fa, fb, area) -> 
-                                m = (a+b)/2,
-                                fm = f(m),
-                                left_area = (fa+fm)*(m-a)/2,
-                                right_area = (fm+fb)*(b-m)/2,
+compute_interval (A, B, Fa, Fb, Area) -> 
+                                M = (A+B)/2,
+                                Fm = f(M),
+                                Left_area = (Fa+Fm)*(M-A)/2,
+                                Right_area = (Fm+Fb)*(B-M)/2,
 
+                                Cmp_1=abs( Area - (Left_area + Right_area)),
+				Cmp_2=math:pow(1.0, math:exp(-9)),
                                 if
-                                   abs( area- (left_area+ right_area)) < math:pow(1.0,exp(-9) )  ->   ci = left_area+right_area;
-                                                                                                                                         ci;
+                                   Cmp_1 < Cmp_2  ->   Left_area+Right_area;
 
                                 true ->
-                                        left = compute_interval (a,m,fa,fm,left_area);
-                                        right = compute_interval (m,b,fm,fb,right_area);
-                                        cid = left_area+right_area;
-                                        cid;
+                                        Left = compute_interval (A,M,Fa,Fm,Left_area),
+                                        Right = compute_interval (M,B,Fm,Fb,Right_area),
+                                        Left+Right
                                 end.
