@@ -1,8 +1,5 @@
 -module(intpar).
--export([integral/2, compute_interval/5]).
-
-%% función x^2 para PROBAR
-f(X) -> math:pow(X, 2).
+-export([integral/3, compute_interval/6]).
 
 %%---------------------------------------------------------
 %% Función: integral/3
@@ -13,16 +10,16 @@ f(X) -> math:pow(X, 2).
 %% Devuelve: El valor de la integral
 %%---------------------------------------------------------
 
-integral (A,B) ->
-                                Fa = f(A),
-                                Fb = f(B),
+integral (F, A,B) ->
+                                Fa = F(A),
+                                Fb = F(B),
                                 Area = (Fa+Fb)*(B-A)/2,
-                                Integral = compute_interval(A,B,Fa,Fb,Area),
+                                Integral = compute_interval(F, A,B,Fa,Fb,Area),
                                 io:format("Integral de x^2: ~p~n",[Integral]).
 
-compute_interval (A, B, Fa, Fb, Area) -> 
+compute_interval (F, A, B, Fa, Fb, Area) -> 
                                 M = (A+B)/2,
-                                Fm = f(M),
+                                Fm = F(M),
                                 Left_area = (Fa+Fm)*(M-A)/2,
                                 Right_area = (Fm+Fb)*(B-M)/2,
 
@@ -32,10 +29,15 @@ compute_interval (A, B, Fa, Fb, Area) ->
                                    Cmp_1 < Cmp_2  ->   Left_area+Right_area;
 
                                 true ->
-					pid=spawn(intseq, compute_interval, [A,M,Fa,Fm,Left_area]),
-                                        Right = compute_interval (M,B,Fm,Fb,Right_area),
+					%%creo un nuevo proceso, diciendolé que calcule uno de los subintervalos
+					pid=spawn(intseq, compute_interval, [F,A,M,Fa,Fm,Left_area]),
+					%%YO, proceso master,sigo calculando el otro subintervalo
+                                        Right = compute_interval (F,M,B,Fm,Fb,Right_area),
+					%%cuando el otro proceso termine de calcular y me devuelva el subintervalo ya calculado
                                         receive I when is_float(I) -> 
+											%%YO proceso master, lo guardo en Left
                                                                                            Left = I
                                         end,
+					%%YO proceso master, sumo los subintervalos ya calculados, y devuelvo la integral ya calculada
                                         Left+Right
                                 end.
