@@ -52,8 +52,7 @@ master(Workers=0, Problems=0, Pid) ->
 master (Workers>=0, Problems>=0, {F, A, B, Fa, Fb, Area, Pid}) ->
 															Problems_New=Problems+1,
 															Workers_New=Workers+1,
-															Ver=(Workers_New =< 10) and (Problems_New =< 10),
 															if
-																Ver==true -> 
+																(Workers_New =< 10) == true -> 
 																			spawn(intcent, compute_interval_childs, [F, A, B, Fa, Fb, Area, Pid, Workers_New, Problems_New] )
 															end.
