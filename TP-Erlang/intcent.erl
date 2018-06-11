@@ -33,15 +33,17 @@ compute_interval_childs (F, A, B, Fa, Fb, Area, Pid, Workers, Problems_New) ->
 				Tmp=Left_area+Right_area,
 				%%io:format("HIjo pid: ~w~n", [Pid_child]),
                                 if
-                                   Cmp_1 < Cmp_2  ->   Pid ! Tmp;
-									 master(Workers_2, Problems_New_2, Pid);
+                                   Cmp_1 < Cmp_2  ->   %%si terminé, mando mi suma a quien me llamó, y llamo al master para decirle "che, ya terminé"
+									Pid ! Tmp;
+									master(Workers_2, Problems_New_2, {Pid});
                                 true ->
+					%%si no, mando uno de mis problemas al master, y calculo la otra mitad del área asignada yo
                                         master (Workers, Problems_New, {F, A, M, Fa, Fm, Left_area, Pid} ), %%Left
                                         compute_interval_childs(F, M, B, Fm, Fb, Right_area, Pid_child, Workers, Problems_New) %%Right
                                 end.
 
 %%Si Workers es 0 (cantidad de workers ocupados), no hay problemas para resolver, y devuelvo un resultado junto con Pid, mando a mis hijos "fin" y devuelvo a "integral()" la suma hasta el momento
-master(Workers=0, Problems=0, Pid) ->
+master(Workers=0, Problems=0, {Pid}) ->
 					    				receive R when is_float(R) ->
 										Resultado=R
 									end,    
@@ -49,7 +51,7 @@ master(Workers=0, Problems=0, Pid) ->
 									Resultado;
 
 %%Si la cantidad de workers ocupados es distinto de 0 o igual a 0, y la cantidad de problemas a resolver es distinto de 0 o igual a 0 y estoy enviando argumentos para una tarea, creo una nueva tarea
-master (Workers>=0, Problems>=0, {F, A, B, Fa, Fb, Area, Pid}) ->
+master(Workers>=0, Problems>=0, {F, A, B, Fa, Fb, Area, Pid}) ->
 															Problems_New=Problems+1,
 															Workers_New=Workers+1,
 															if
