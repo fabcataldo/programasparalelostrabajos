@@ -99,7 +99,7 @@ void AES_128_ecb_encrypt(const unsigned char* in, unsigned char* out, unsigned l
 		out[i] = outblock[i];
 	}
 
-	//complete_len sería los bloques que son múltiplos de 16 más el relleno
+	//complete_len sería el len que viene de entrada más el padding
 	unsigned int complete_len = len+padding_value;
 	*olen=complete_len;
 }
